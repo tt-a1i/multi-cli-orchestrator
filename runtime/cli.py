@@ -24,7 +24,7 @@ class _HelpFormatter(argparse.RawTextHelpFormatter):
 
 
 TOP_LEVEL_DESCRIPTION = (
-    "MCO orchestrates multiple coding-agent CLIs with wait-all execution.\n"
+    "MCO - Orchestrate AI Coding Agents. Any Prompt. Any Agent. Any IDE.\n"
     "Use `run` for general tasks and `review` for structured findings."
 )
 
