@@ -81,6 +81,23 @@ class AdapterContractTests(unittest.TestCase):
             self.assertEqual(len(findings), 1)
             self.assertEqual(findings[0].provider, "codex")
 
+    def test_codex_adapter_includes_output_schema_when_provided(self) -> None:
+        adapter = CodexAdapter()
+        with tempfile.TemporaryDirectory() as tmpdir:
+            task = TaskInput(
+                task_id="task-codex-schema",
+                prompt="review",
+                repo_root=tmpdir,
+                target_paths=["."],
+                metadata={
+                    "artifact_root": tmpdir,
+                    "output_schema_path": "/tmp/review.schema.json",
+                },
+            )
+            cmd = adapter._build_command(task)  # type: ignore[attr-defined]
+            self.assertIn("--output-schema", cmd)
+            self.assertIn("/tmp/review.schema.json", cmd)
+
     def test_adapter_cancel(self) -> None:
         adapter = ClaudeAdapter()
         with tempfile.TemporaryDirectory() as tmpdir:

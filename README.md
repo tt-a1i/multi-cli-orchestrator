@@ -56,6 +56,9 @@ Config file (JSON):
   "state_file": ".mco/state.json",
   "policy": {
     "timeout_seconds": 180,
+    "stall_timeout_seconds": 900,
+    "poll_interval_seconds": 1.0,
+    "review_hard_timeout_seconds": 1800,
     "max_retries": 1,
     "high_escalation_threshold": 1,
     "require_non_empty_findings": true,
@@ -91,7 +94,9 @@ Override fan-out and per-provider timeout from CLI:
   --prompt "Review for bugs and security issues." \
   --providers claude,codex,gemini,opencode,qwen \
   --max-provider-parallelism 2 \
-  --provider-timeouts qwen=240,codex=120
+  --stall-timeout 900 \
+  --review-hard-timeout 1800 \
+  --provider-timeouts qwen=900,codex=900
 ```
 
 Run mode with hard path constraints:
@@ -125,8 +130,11 @@ Notes:
 - Review prompt is wrapped with a strict JSON finding contract by default.
 - `run` mode does not force findings schema; it focuses on execution aggregation and provider success.
 - Execution model is `wait-all`: one provider timeout/failure does not stop others.
+- Timeout behavior is progress-driven:
+  - `stall_timeout_seconds`: cancel only when output progress is idle beyond threshold.
+  - `review_hard_timeout_seconds`: hard deadline applied only in `review` mode.
 - `max_provider_parallelism=0` (or omitted) means full parallelism across selected providers.
-- Built-in provider timeout profile defaults to `claude=300s` and `codex=240s`; config/CLI overrides still take precedence.
+- `provider_timeouts` are provider-specific stall-timeout overrides.
 - `allow_paths` and `target_paths` are validated against `repo_root`; path escape is rejected.
 - `enforcement_mode=strict` (default) fails closed when provider permission requirements cannot be honored.
 

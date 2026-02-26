@@ -12,7 +12,6 @@ from runtime.cli import (
     build_parser,
     _resolve_config,
 )
-from runtime.config import DEFAULT_PROVIDER_TIMEOUTS
 
 
 class CliTests(unittest.TestCase):
@@ -46,6 +45,9 @@ class CliTests(unittest.TestCase):
                         "policy": {
                             "timeout_seconds": 180,
                             "max_retries": 1,
+                            "stall_timeout_seconds": 400,
+                            "poll_interval_seconds": 0.5,
+                            "review_hard_timeout_seconds": 999,
                             "max_provider_parallelism": 2,
                             "provider_timeouts": {"qwen": 240},
                             "provider_permissions": {"codex": {"sandbox": "read-only"}},
@@ -67,6 +69,12 @@ class CliTests(unittest.TestCase):
                     "3",
                     "--provider-timeouts",
                     "codex=120",
+                    "--stall-timeout",
+                    "700",
+                    "--poll-interval",
+                    "2.0",
+                    "--review-hard-timeout",
+                    "3000",
                     "--allow-paths",
                     "src,tests",
                     "--enforcement-mode",
@@ -79,7 +87,10 @@ class CliTests(unittest.TestCase):
             self.assertEqual(resolved.policy.max_provider_parallelism, 3)
             self.assertEqual(resolved.policy.provider_timeouts.get("qwen"), 240)
             self.assertEqual(resolved.policy.provider_timeouts.get("codex"), 120)
-            self.assertEqual(resolved.policy.provider_timeouts.get("claude"), DEFAULT_PROVIDER_TIMEOUTS["claude"])
+            self.assertIsNone(resolved.policy.provider_timeouts.get("claude"))
+            self.assertEqual(resolved.policy.stall_timeout_seconds, 700)
+            self.assertEqual(resolved.policy.poll_interval_seconds, 2.0)
+            self.assertEqual(resolved.policy.review_hard_timeout_seconds, 3000)
             self.assertEqual(resolved.policy.allow_paths, ["src", "tests"])
             self.assertEqual(resolved.policy.enforcement_mode, "best_effort")
             self.assertEqual(resolved.policy.provider_permissions.get("codex"), {"sandbox": "read-only"})

@@ -25,6 +25,7 @@ STRICT_JSON_CONTRACT = (
     '"recommendation":"<fix>","confidence":0.0,"fingerprint":"<stable-hash>"}]}. '
     "If no findings, return {\"findings\":[]}."
 )
+REVIEW_FINDINGS_SCHEMA_PATH = Path(__file__).resolve().parent / "schemas" / "review_findings.schema.json"
 
 
 @dataclass(frozen=True)
@@ -191,13 +192,34 @@ def _supported_permission_keys(adapter: ProviderAdapter) -> Set[str]:
     return {str(item).strip() for item in keys if str(item).strip()}
 
 
-def _provider_timeout_seconds(policy: ReviewPolicy, provider: str) -> int:
-    timeout = policy.provider_timeouts.get(provider, policy.timeout_seconds)
+def _provider_stall_timeout_seconds(policy: ReviewPolicy, provider: str) -> int:
+    timeout = policy.provider_timeouts.get(provider, policy.stall_timeout_seconds)
     try:
         value = int(timeout)
     except Exception:
-        value = policy.timeout_seconds
-    return value if value > 0 else policy.timeout_seconds
+        value = policy.stall_timeout_seconds
+    return value if value > 0 else policy.stall_timeout_seconds
+
+
+def _poll_interval_seconds(policy: ReviewPolicy) -> float:
+    try:
+        value = float(policy.poll_interval_seconds)
+    except Exception:
+        value = 1.0
+    return value if value > 0 else 1.0
+
+
+def _timestamp_to_iso(timestamp: float) -> str:
+    return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(timestamp))
+
+
+def _raw_output_size_snapshot(artifact_path: str, provider: str) -> Tuple[int, int]:
+    root = Path(artifact_path) / "raw"
+    stdout_path = root / f"{provider}.stdout.log"
+    stderr_path = root / f"{provider}.stderr.log"
+    stdout_size = stdout_path.stat().st_size if stdout_path.exists() else 0
+    stderr_size = stderr_path.stat().st_size if stderr_path.exists() else 0
+    return (stdout_size, stderr_size)
 
 
 def _ensure_provider_artifacts(artifact_base: str, task_id: str, provider: str) -> None:
@@ -250,6 +272,7 @@ def _run_provider(
     runtime: OrchestratorRuntime,
     adapter_map: Mapping[str, ProviderAdapter],
     resolved_task_id: str,
+    idempotency_key: str,
     full_prompt: str,
     target_paths: List[str],
     allow_paths: List[str],
@@ -317,33 +340,78 @@ def _run_provider(
             },
         )
 
-    dispatch_key = _sha(f"{resolved_task_id}:{provider}:dispatch-v1")
-    provider_timeout = _provider_timeout_seconds(request.policy, provider)
+    dispatch_key = _sha(f"{idempotency_key}:{provider}:dispatch-v2")
+    provider_stall_timeout = _provider_stall_timeout_seconds(request.policy, provider)
+    poll_interval_seconds = _poll_interval_seconds(request.policy)
+    review_hard_timeout_seconds = request.policy.review_hard_timeout_seconds if review_mode else 0
 
     def runner(_attempt: int) -> AttemptResult:
         run_ref = None
         try:
+            metadata = {
+                "artifact_root": request.artifact_base,
+                "allow_paths": allow_paths,
+                "provider_permissions": effective_permissions,
+                "enforcement_mode": request.policy.enforcement_mode,
+            }
+            if review_mode and provider == "codex" and REVIEW_FINDINGS_SCHEMA_PATH.exists():
+                metadata["output_schema_path"] = str(REVIEW_FINDINGS_SCHEMA_PATH)
             input_task = TaskInput(
                 task_id=resolved_task_id,
                 prompt=full_prompt,
                 repo_root=request.repo_root,
                 target_paths=target_paths,
-                timeout_seconds=provider_timeout,
-                metadata={
-                    "artifact_root": request.artifact_base,
-                    "allow_paths": allow_paths,
-                    "provider_permissions": effective_permissions,
-                    "enforcement_mode": request.policy.enforcement_mode,
-                },
+                timeout_seconds=provider_stall_timeout,
+                metadata=metadata,
             )
             run_ref = adapter.run(input_task)
             started = time.time()
+            last_progress_at = started
+            last_snapshot = _raw_output_size_snapshot(run_ref.artifact_path, provider)
             status = None
-            while time.time() - started < provider_timeout:
+            while True:
                 status = adapter.poll(run_ref)
+                now = time.time()
                 if status.completed:
                     break
-                time.sleep(0.25)
+
+                current_snapshot = _raw_output_size_snapshot(run_ref.artifact_path, provider)
+                if current_snapshot != last_snapshot:
+                    last_snapshot = current_snapshot
+                    last_progress_at = now
+
+                cancel_reason = ""
+                if review_hard_timeout_seconds > 0 and (now - started) > review_hard_timeout_seconds:
+                    cancel_reason = "hard_deadline_exceeded"
+                elif (now - last_progress_at) > provider_stall_timeout:
+                    cancel_reason = "stall_timeout"
+
+                if cancel_reason:
+                    if run_ref is not None:
+                        try:
+                            adapter.cancel(run_ref)
+                        except Exception:
+                            pass
+                    timeout_payload = {
+                        "cancel_reason": cancel_reason,
+                        "wall_clock_seconds": round(now - started, 3),
+                        "last_progress_at": _timestamp_to_iso(last_progress_at),
+                        "parse_ok": False,
+                        "parse_reason": "",
+                        "schema_valid_count": 0,
+                        "dropped_count": 0,
+                        "findings": [],
+                        "run_ref": asdict(run_ref),
+                        "status": asdict(status),
+                    }
+                    return AttemptResult(
+                        success=False,
+                        output=timeout_payload,
+                        error_kind=ErrorKind.RETRYABLE_TIMEOUT,
+                        stderr=cancel_reason,
+                    )
+
+                time.sleep(poll_interval_seconds)
 
             if status is None or not status.completed:
                 if run_ref is not None:
@@ -351,7 +419,24 @@ def _run_provider(
                         adapter.cancel(run_ref)
                     except Exception:
                         pass
-                return AttemptResult(success=False, error_kind=ErrorKind.RETRYABLE_TIMEOUT, stderr="provider_poll_timeout")
+                fallback_payload = {
+                    "cancel_reason": "provider_poll_timeout",
+                    "wall_clock_seconds": round(time.time() - started, 3),
+                    "last_progress_at": _timestamp_to_iso(last_progress_at),
+                    "parse_ok": False,
+                    "parse_reason": "",
+                    "schema_valid_count": 0,
+                    "dropped_count": 0,
+                    "findings": [],
+                    "run_ref": asdict(run_ref) if run_ref is not None else None,
+                    "status": asdict(status) if status is not None else None,
+                }
+                return AttemptResult(
+                    success=False,
+                    output=fallback_payload,
+                    error_kind=ErrorKind.RETRYABLE_TIMEOUT,
+                    stderr="provider_poll_timeout",
+                )
 
             raw_stdout = _read_text(Path(run_ref.artifact_path) / "raw" / f"{provider}.stdout.log")
             findings: List[NormalizedFinding] = []
@@ -383,6 +468,9 @@ def _run_provider(
                 "provider": provider,
                 "status": asdict(status),
                 "run_ref": asdict(run_ref),
+                "cancel_reason": "",
+                "wall_clock_seconds": round(time.time() - started, 3),
+                "last_progress_at": _timestamp_to_iso(last_progress_at),
                 "parse_ok": parse_ok,
                 "parse_reason": parse_reason,
                 "schema_valid_count": schema_valid_count,
@@ -404,11 +492,20 @@ def _run_provider(
     provider_dropped = int(output.get("dropped_count", 0))
     findings = _deserialize_findings(output.get("findings"))
 
+    wall_clock_value = output.get("wall_clock_seconds")
+    try:
+        wall_clock_seconds = float(wall_clock_value) if wall_clock_value is not None else 0.0
+    except Exception:
+        wall_clock_seconds = 0.0
+
     provider_result = {
         "success": run_result.success,
         "attempts": run_result.attempts,
         "final_error": run_result.final_error.value if run_result.final_error else None,
         "deduped_dispatch": run_result.deduped_dispatch,
+        "cancel_reason": str(output.get("cancel_reason", "")),
+        "wall_clock_seconds": wall_clock_seconds,
+        "last_progress_at": str(output.get("last_progress_at", "")),
         "parse_ok": parse_ok,
         "parse_reason": str(output.get("parse_reason", "")),
         "schema_valid_count": provider_schema_valid,
@@ -505,6 +602,7 @@ def run_review(
                 runtime,
                 adapter_map,
                 resolved_task_id,
+                idempotency_key,
                 full_prompt,
                 normalized_targets,
                 normalized_allow_paths,
@@ -520,6 +618,7 @@ def run_review(
                     runtime,
                     adapter_map,
                     resolved_task_id,
+                    idempotency_key,
                     full_prompt,
                     normalized_targets,
                     normalized_allow_paths,

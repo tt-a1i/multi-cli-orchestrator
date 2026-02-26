@@ -36,7 +36,7 @@ class CodexAdapter(ShimAdapterBase):
             value = raw_permissions.get("sandbox")
             if isinstance(value, str) and value.strip():
                 sandbox = value.strip()
-        return [
+        cmd = [
             "codex",
             "exec",
             "--skip-git-repo-check",
@@ -45,11 +45,27 @@ class CodexAdapter(ShimAdapterBase):
             "--sandbox",
             sandbox,
             "--json",
-            input_task.prompt,
         ]
+        output_schema_path = input_task.metadata.get("output_schema_path")
+        if isinstance(output_schema_path, str) and output_schema_path.strip():
+            cmd.extend(["--output-schema", output_schema_path.strip()])
+        cmd.append(input_task.prompt)
+        return cmd
 
     def _build_command_for_record(self) -> List[str]:
-        return ["codex", "exec", "--skip-git-repo-check", "-C", "<repo_root>", "--sandbox", "workspace-write", "--json", "<prompt>"]
+        return [
+            "codex",
+            "exec",
+            "--skip-git-repo-check",
+            "-C",
+            "<repo_root>",
+            "--sandbox",
+            "workspace-write",
+            "--json",
+            "--output-schema",
+            "<schema-path>",
+            "<prompt>",
+        ]
 
     def _is_success(self, return_code: int, stdout_text: str, stderr_text: str) -> bool:
         if return_code == 0:

@@ -118,6 +118,27 @@ class TimedFakeAdapter(FakeAdapter):
         self.cancel_calls += 1
 
 
+class ProgressTimedFakeAdapter(TimedFakeAdapter):
+    def __init__(
+        self,
+        provider: str,
+        raw_stdout: str,
+        complete_after_seconds: float,
+        progress_chunk: str = ".",
+    ) -> None:
+        super().__init__(provider, raw_stdout, complete_after_seconds)
+        self.progress_chunk = progress_chunk
+
+    def poll(self, ref: TaskRunRef) -> TaskStatus:
+        status = super().poll(ref)
+        if not status.completed:
+            stdout_path = Path(ref.artifact_path) / "raw" / f"{self.id}.stdout.log"
+            stdout_path.parent.mkdir(parents=True, exist_ok=True)
+            with stdout_path.open("a", encoding="utf-8") as fh:
+                fh.write(self.progress_chunk)
+        return status
+
+
 class PermissionAwareFakeAdapter(FakeAdapter):
     def __init__(self, provider: str, raw_stdout: str, supported_keys: list[str]) -> None:
         super().__init__(provider, raw_stdout)
@@ -222,6 +243,47 @@ class ReviewEngineTests(unittest.TestCase):
             self.assertTrue(review_result.created_new_task)
             self.assertTrue(run_result.created_new_task)
 
+    def test_dispatch_cache_isolation_uses_idempotency_fingerprint(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            adapter = FakeAdapter("claude", "raw output")
+            req_a = ReviewRequest(
+                repo_root=tmpdir,
+                prompt="same-prompt",
+                providers=["claude"],  # type: ignore[list-item]
+                artifact_base=f"{tmpdir}/artifacts",
+                state_file=f"{tmpdir}/state.json",
+                task_id="task-fixed-dispatch",
+                target_paths=["runtime"],
+                policy=ReviewPolicy(
+                    timeout_seconds=3,
+                    max_retries=0,
+                    require_non_empty_findings=False,
+                    allow_paths=["."],
+                ),
+            )
+            req_b = ReviewRequest(
+                repo_root=tmpdir,
+                prompt="same-prompt",
+                providers=["claude"],  # type: ignore[list-item]
+                artifact_base=f"{tmpdir}/artifacts",
+                state_file=f"{tmpdir}/state.json",
+                task_id="task-fixed-dispatch",
+                target_paths=["runtime"],
+                policy=ReviewPolicy(
+                    timeout_seconds=3,
+                    max_retries=0,
+                    require_non_empty_findings=False,
+                    allow_paths=["runtime"],
+                ),
+            )
+            first = run_review(req_a, adapters={"claude": adapter}, review_mode=False)
+            second = run_review(req_b, adapters={"claude": adapter}, review_mode=False)
+            self.assertTrue(first.created_new_task)
+            self.assertTrue(second.created_new_task)
+            self.assertEqual(adapter.runs, 2)
+            self.assertFalse(bool(first.provider_results["claude"].get("deduped_dispatch")))
+            self.assertFalse(bool(second.provider_results["claude"].get("deduped_dispatch")))
+
     def test_wait_all_keeps_fast_provider_when_other_times_out(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             fast = FakeAdapter(
@@ -241,6 +303,7 @@ class ReviewEngineTests(unittest.TestCase):
                 state_file=f"{tmpdir}/state.json",
                 policy=ReviewPolicy(
                     timeout_seconds=1,
+                    stall_timeout_seconds=1,
                     max_retries=0,
                     require_non_empty_findings=True,
                     max_provider_parallelism=2,
@@ -253,6 +316,61 @@ class ReviewEngineTests(unittest.TestCase):
             self.assertEqual(result.parse_failure_count, 1)
             self.assertEqual(result.decision, "PASS")
             self.assertGreaterEqual(slow.cancel_calls, 1)
+
+    def test_progress_output_prevents_stall_timeout_in_run_mode(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            progressive = ProgressTimedFakeAdapter(
+                "claude",
+                "raw output",
+                complete_after_seconds=2.0,
+            )
+            req = ReviewRequest(
+                repo_root=tmpdir,
+                prompt="run",
+                providers=["claude"],  # type: ignore[list-item]
+                artifact_base=f"{tmpdir}/artifacts",
+                state_file=f"{tmpdir}/state.json",
+                policy=ReviewPolicy(
+                    timeout_seconds=1,
+                    stall_timeout_seconds=1,
+                    poll_interval_seconds=0.1,
+                    max_retries=0,
+                    require_non_empty_findings=False,
+                ),
+            )
+            result = run_review(req, adapters={"claude": progressive}, review_mode=False)
+            self.assertEqual(result.terminal_state, "COMPLETED")
+            provider_result = result.provider_results["claude"]
+            self.assertEqual(provider_result.get("cancel_reason"), "")
+
+    def test_review_hard_timeout_cancels_even_with_progress(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            progressive = ProgressTimedFakeAdapter(
+                "claude",
+                '{"findings":[]}',
+                complete_after_seconds=5.0,
+            )
+            req = ReviewRequest(
+                repo_root=tmpdir,
+                prompt="review",
+                providers=["claude"],  # type: ignore[list-item]
+                artifact_base=f"{tmpdir}/artifacts",
+                state_file=f"{tmpdir}/state.json",
+                policy=ReviewPolicy(
+                    timeout_seconds=1,
+                    stall_timeout_seconds=10,
+                    review_hard_timeout_seconds=1,
+                    poll_interval_seconds=0.1,
+                    max_retries=0,
+                    require_non_empty_findings=True,
+                ),
+            )
+            result = run_review(req, adapters={"claude": progressive}, review_mode=True)
+            self.assertEqual(result.terminal_state, "FAILED")
+            provider_result = result.provider_results["claude"]
+            self.assertEqual(provider_result.get("final_error"), "retryable_timeout")
+            self.assertEqual(provider_result.get("cancel_reason"), "hard_deadline_exceeded")
+            self.assertGreaterEqual(progressive.cancel_calls, 1)
 
     def test_provider_timeout_override_allows_slow_provider_to_succeed(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
