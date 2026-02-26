@@ -36,10 +36,10 @@ English | [简体中文](./README.zh-CN.md)
 
 ## Installation
 
-Python package (recommended):
+NPM wrapper (available now, Python 3 required on PATH):
 
 ```bash
-pipx install mco
+npm i -g @tt-a1i/mco
 mco --help
 ```
 
@@ -52,12 +52,9 @@ python3 -m pip install -e .
 mco --help
 ```
 
-NPM wrapper (Python 3 required on PATH):
-
-```bash
-npm i -g @tt-a1i/mco
-mco --help
-```
+Python package via PyPI:
+- Not published yet.
+- Publish workflow is ready and will be enabled after PyPI Trusted Publisher setup.
 
 Quick start:
 ```bash

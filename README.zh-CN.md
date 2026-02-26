@@ -35,10 +35,10 @@
 
 ## 安装
 
-Python 包（推荐）：
+npm 包装器（当前可用，系统需有 Python 3）：
 
 ```bash
-pipx install mco
+npm i -g @tt-a1i/mco
 mco --help
 ```
 
@@ -51,12 +51,9 @@ python3 -m pip install -e .
 mco --help
 ```
 
-npm 包装器（系统需有 Python 3）：
-
-```bash
-npm i -g @tt-a1i/mco
-mco --help
-```
+Python 包（PyPI）：
+- 目前尚未发布。
+- 发布流程已就绪，待完成 PyPI Trusted Publisher 配置后开启。
 
 快速开始：
 
