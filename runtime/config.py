@@ -6,14 +6,15 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 DEFAULT_PROVIDER_TIMEOUTS: Dict[str, int] = {
-    "claude": 300,
-    "codex": 240,
 }
 
 
 @dataclass(frozen=True)
 class ReviewPolicy:
     timeout_seconds: int = 180
+    stall_timeout_seconds: int = 900
+    poll_interval_seconds: float = 1.0
+    review_hard_timeout_seconds: int = 1800
     max_retries: int = 1
     high_escalation_threshold: int = 1
     require_non_empty_findings: bool = True
@@ -98,8 +99,32 @@ def _to_policy(payload: Dict[str, Any]) -> ReviewPolicy:
     if enforcement_mode not in ("strict", "best_effort"):
         enforcement_mode = "strict"
 
+    try:
+        stall_timeout_seconds = int(payload.get("stall_timeout_seconds", 900))
+    except Exception:
+        stall_timeout_seconds = 900
+    if stall_timeout_seconds <= 0:
+        stall_timeout_seconds = 900
+
+    try:
+        poll_interval_seconds = float(payload.get("poll_interval_seconds", 1.0))
+    except Exception:
+        poll_interval_seconds = 1.0
+    if poll_interval_seconds <= 0:
+        poll_interval_seconds = 1.0
+
+    try:
+        review_hard_timeout_seconds = int(payload.get("review_hard_timeout_seconds", 1800))
+    except Exception:
+        review_hard_timeout_seconds = 1800
+    if review_hard_timeout_seconds < 0:
+        review_hard_timeout_seconds = 1800
+
     return ReviewPolicy(
         timeout_seconds=int(payload.get("timeout_seconds", 180)),
+        stall_timeout_seconds=stall_timeout_seconds,
+        poll_interval_seconds=poll_interval_seconds,
+        review_hard_timeout_seconds=review_hard_timeout_seconds,
         max_retries=int(payload.get("max_retries", 1)),
         high_escalation_threshold=int(payload.get("high_escalation_threshold", 1)),
         require_non_empty_findings=_as_bool(payload.get("require_non_empty_findings", True), True),

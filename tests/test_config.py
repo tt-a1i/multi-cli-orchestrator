@@ -14,6 +14,9 @@ class ConfigTests(unittest.TestCase):
         self.assertEqual(cfg.providers, ["claude", "codex"])
         self.assertEqual(cfg.policy.max_provider_parallelism, 0)
         self.assertEqual(cfg.policy.provider_timeouts, DEFAULT_PROVIDER_TIMEOUTS)
+        self.assertEqual(cfg.policy.stall_timeout_seconds, 900)
+        self.assertEqual(cfg.policy.poll_interval_seconds, 1.0)
+        self.assertEqual(cfg.policy.review_hard_timeout_seconds, 1800)
         self.assertEqual(cfg.policy.allow_paths, ["."])
         self.assertEqual(cfg.policy.provider_permissions, {})
         self.assertEqual(cfg.policy.enforcement_mode, "strict")
@@ -29,6 +32,9 @@ class ConfigTests(unittest.TestCase):
                         "state_file": ".mco/custom-state.json",
                         "policy": {
                             "timeout_seconds": 99,
+                            "stall_timeout_seconds": 321,
+                            "poll_interval_seconds": 2.5,
+                            "review_hard_timeout_seconds": 2222,
                             "require_non_empty_findings": False,
                             "max_provider_parallelism": 3,
                             "provider_timeouts": {"claude": 120},
@@ -44,10 +50,13 @@ class ConfigTests(unittest.TestCase):
             self.assertEqual(cfg.artifact_base, "reports/custom")
             self.assertEqual(cfg.state_file, ".mco/custom-state.json")
             self.assertEqual(cfg.policy.timeout_seconds, 99)
+            self.assertEqual(cfg.policy.stall_timeout_seconds, 321)
+            self.assertEqual(cfg.policy.poll_interval_seconds, 2.5)
+            self.assertEqual(cfg.policy.review_hard_timeout_seconds, 2222)
             self.assertFalse(cfg.policy.require_non_empty_findings)
             self.assertEqual(cfg.policy.max_provider_parallelism, 3)
             self.assertEqual(cfg.policy.provider_timeouts.get("claude"), 120)
-            self.assertEqual(cfg.policy.provider_timeouts.get("codex"), DEFAULT_PROVIDER_TIMEOUTS["codex"])
+            self.assertIsNone(cfg.policy.provider_timeouts.get("codex"))
             self.assertEqual(cfg.policy.allow_paths, ["src", "tests"])
             self.assertEqual(cfg.policy.provider_permissions.get("codex"), {"sandbox": "read-only"})
             self.assertEqual(cfg.policy.enforcement_mode, "best_effort")

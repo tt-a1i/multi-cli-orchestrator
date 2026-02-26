@@ -118,7 +118,25 @@ def _add_common_execution_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "--provider-timeouts",
         default="",
-        help="Comma-separated provider timeout overrides, e.g. claude=120,codex=90",
+        help="Comma-separated provider stall-timeout overrides, e.g. claude=120,codex=90",
+    )
+    parser.add_argument(
+        "--stall-timeout",
+        type=int,
+        default=None,
+        help="Override default stall timeout seconds (no output progress => cancel)",
+    )
+    parser.add_argument(
+        "--poll-interval",
+        type=float,
+        default=None,
+        help="Override poll interval seconds for provider status checks",
+    )
+    parser.add_argument(
+        "--review-hard-timeout",
+        type=int,
+        default=None,
+        help="Override review-mode hard deadline seconds (0 disables hard deadline)",
     )
     parser.add_argument("--json", action="store_true", help="Print machine-readable result JSON")
 
@@ -151,9 +169,21 @@ def _resolve_config(args: argparse.Namespace) -> ReviewConfig:
     if args.max_provider_parallelism is not None:
         max_provider_parallelism = args.max_provider_parallelism
     enforcement_mode = args.enforcement_mode or cfg.policy.enforcement_mode
+    stall_timeout_seconds = cfg.policy.stall_timeout_seconds
+    if args.stall_timeout is not None and args.stall_timeout > 0:
+        stall_timeout_seconds = args.stall_timeout
+    poll_interval_seconds = cfg.policy.poll_interval_seconds
+    if args.poll_interval is not None and args.poll_interval > 0:
+        poll_interval_seconds = args.poll_interval
+    review_hard_timeout_seconds = cfg.policy.review_hard_timeout_seconds
+    if args.review_hard_timeout is not None and args.review_hard_timeout >= 0:
+        review_hard_timeout_seconds = args.review_hard_timeout
 
     policy = ReviewPolicy(
         timeout_seconds=cfg.policy.timeout_seconds,
+        stall_timeout_seconds=stall_timeout_seconds,
+        poll_interval_seconds=poll_interval_seconds,
+        review_hard_timeout_seconds=review_hard_timeout_seconds,
         max_retries=cfg.policy.max_retries,
         high_escalation_threshold=cfg.policy.high_escalation_threshold,
         require_non_empty_findings=cfg.policy.require_non_empty_findings,
