@@ -13,6 +13,7 @@
 
 ## Implementation Freeze
 1. [docs/implementation/step0-interface-freeze.md](./docs/implementation/step0-interface-freeze.md)
+2. [docs/contracts/cli-json-v0.1.x.md](./docs/contracts/cli-json-v0.1.x.md)
 
 ## Planning and Tracking
 1. [task_plan.md](./task_plan.md)
