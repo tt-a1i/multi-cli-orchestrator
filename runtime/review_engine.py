@@ -59,6 +59,11 @@ def _sha(value: str) -> str:
     return hashlib.sha256(value.encode("utf-8")).hexdigest()
 
 
+def _stable_payload_hash(payload: object) -> str:
+    serialized = json.dumps(payload, ensure_ascii=True, sort_keys=True, separators=(",", ":"))
+    return _sha(serialized)
+
+
 def _default_task_id(repo_root: str, prompt: str) -> str:
     return f"task-{_sha(f'{repo_root}:{prompt}')[:16]}"
 
@@ -630,10 +635,13 @@ def run_review(
         "created_new_task": created_new_task,
         "terminal_state": terminal_state.value,
         "decision": decision,
+        "effective_cwd": str(Path(request.repo_root).resolve(strict=False)),
         "allow_paths": normalized_allow_paths,
+        "allow_paths_hash": _stable_payload_hash(normalized_allow_paths),
         "target_paths": normalized_targets,
         "enforcement_mode": request.policy.enforcement_mode,
         "provider_permissions": request.policy.provider_permissions,
+        "permissions_hash": _stable_payload_hash(request.policy.provider_permissions),
         "provider_results": provider_results,
         "findings_count": len(aggregated_findings),
         "parse_success_count": parse_success_count,
