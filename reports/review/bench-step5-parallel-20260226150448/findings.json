@@ -1,0 +1,92 @@
+[
+  {
+    "task_id": "bench-step5-parallel-20260226150448",
+    "provider": "claude",
+    "finding_id": "MAINT-001",
+    "severity": "low",
+    "category": "maintainability",
+    "title": "Repository missing project-level CLAUDE.md for contributor onboarding",
+    "evidence": {
+      "file": ".",
+      "line": null,
+      "snippet": "No CLAUDE.md found at project root /Users/tsk/multi-cli-orchestrator/",
+      "symbol": null
+    },
+    "recommendation": "Add a project-level CLAUDE.md documenting build commands, architecture overview, and contribution conventions to reduce onboarding friction.",
+    "confidence": 0.6,
+    "fingerprint": "a1b2c3d4e5f6",
+    "raw_ref": "raw/claude.stdout.log"
+  },
+  {
+    "task_id": "bench-step5-parallel-20260226150448",
+    "provider": "codex",
+    "finding_id": "MNT-001",
+    "severity": "low",
+    "category": "maintainability",
+    "title": "Missing CODEOWNERS reduces maintainability of review ownership",
+    "evidence": {
+      "file": ".",
+      "line": null,
+      "snippet": "No CODEOWNERS file is defined at the repository root to document ownership boundaries.",
+      "symbol": null
+    },
+    "recommendation": "Add a root-level CODEOWNERS file mapping key paths to responsible maintainers to improve long-term maintainability and review routing.",
+    "confidence": 0.23,
+    "fingerprint": "b7f6f5e3a2c9d4e18f0ab6c73d1e9a54",
+    "raw_ref": "raw/codex.stdout.log"
+  },
+  {
+    "task_id": "bench-step5-parallel-20260226150448",
+    "provider": "gemini",
+    "finding_id": "mco-smoke-001",
+    "severity": "low",
+    "category": "maintainability",
+    "title": "Magic String for Configuration Key",
+    "evidence": {
+      "file": "runtime/cli.py",
+      "line": null,
+      "snippet": "config = load_config(args.get(\"config\"))",
+      "symbol": null
+    },
+    "recommendation": "Replace the magic string 'config' with a named constant to improve readability and reduce the risk of typos.",
+    "confidence": 0.0,
+    "fingerprint": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2",
+    "raw_ref": "raw/gemini.stdout.log"
+  },
+  {
+    "task_id": "bench-step5-parallel-20260226150448",
+    "provider": "opencode",
+    "finding_id": "MTN-001",
+    "severity": "low",
+    "category": "maintainability",
+    "title": "\u4ed3\u5e93\u4e0a\u4e0b\u6587\u4e3a\u7a7a\u5bfc\u81f4\u53ef\u7ef4\u62a4\u6027\u57fa\u7ebf\u4e0d\u8db3",
+    "evidence": {
+      "file": ".",
+      "line": null,
+      "snippet": "<directories>\\n  \\n</directories>",
+      "symbol": null
+    },
+    "recommendation": "\u8865\u5145\u6700\u5c0f\u53ef\u7ef4\u62a4\u6027\u57fa\u7ebf\uff1a\u6dfb\u52a0 `README`\uff08\u9879\u76ee\u7528\u9014\u4e0e\u8fd0\u884c\u65b9\u5f0f\uff09\u3001\u57fa\u7840\u4ee3\u7801\u7ed3\u6784\u8bf4\u660e\uff0c\u4ee5\u53ca\u7edf\u4e00\u7684\u683c\u5f0f\u5316/\u9759\u6001\u68c0\u67e5\u914d\u7f6e\uff08\u5982 `editorconfig`\u3001lint/format \u811a\u672c\uff09\uff0c\u4ee5\u964d\u4f4e\u540e\u7eed\u534f\u4f5c\u4e0e\u5ba1\u67e5\u6210\u672c\u3002",
+    "confidence": 0.69,
+    "fingerprint": "f3f9eb16f1f0f9d3a9e11d9f34d0d8b1c0e2f3b8a6d4c5e7f9a1b2c3d4e5f607",
+    "raw_ref": "raw/opencode.stdout.log"
+  },
+  {
+    "task_id": "bench-step5-parallel-20260226150448",
+    "provider": "qwen",
+    "finding_id": "MAINT-001",
+    "severity": "low",
+    "category": "maintainability",
+    "title": "Magic number in configuration without named constant",
+    "evidence": {
+      "file": "mco",
+      "line": null,
+      "snippet": "timeout or parallelism value used directly without const",
+      "symbol": null
+    },
+    "recommendation": "Extract magic numbers to named constants with descriptive names for better code maintainability",
+    "confidence": 0.75,
+    "fingerprint": "maint-001-mco-magic-number",
+    "raw_ref": "raw/qwen.stdout.log"
+  }
+]

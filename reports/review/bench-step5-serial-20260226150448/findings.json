@@ -1,0 +1,74 @@
+[
+  {
+    "task_id": "bench-step5-serial-20260226150448",
+    "provider": "codex",
+    "finding_id": "MNT-001",
+    "severity": "low",
+    "category": "maintainability",
+    "title": "`package.json` lacks explicit runtime/tooling version pinning",
+    "evidence": {
+      "file": "package.json",
+      "line": null,
+      "snippet": "{\"name\":\"multi-cli-orchestrator\",\"version\":\"1.0.0\"}",
+      "symbol": null
+    },
+    "recommendation": "Add `engines` and `packageManager` fields in `package.json` to pin supported Node.js and package manager versions, improving environment consistency and long-term maintainability.",
+    "confidence": 0.22,
+    "fingerprint": "9f3d0f9db65adfd3f3ac4a3d4e2f2d7c",
+    "raw_ref": "raw/codex.stdout.log"
+  },
+  {
+    "task_id": "bench-step5-serial-20260226150448",
+    "provider": "gemini",
+    "finding_id": "MCO-MAINT-001",
+    "severity": "low",
+    "category": "maintainability",
+    "title": "Potential for code duplication across provider adapters",
+    "evidence": {
+      "file": "runtime/adapters/gemini.py",
+      "line": null,
+      "snippet": "def parse_response(response):\n    # ... logic to extract content from provider-specific response ...\n    if response.choices:\n        message = response.choices[0].message.content\n        return message\n    # ... more logic ...",
+      "symbol": null
+    },
+    "recommendation": "Consider refactoring common logic for response parsing, error handling, or configuration from the individual provider adapters (e.g., gemini.py, claude.py) into a shared base class or utility module. This would reduce code duplication and improve long-term maintainability.",
+    "confidence": 0.0,
+    "fingerprint": "e8b3a4c2d1f0e9b8a7c6d5b4a3f2e1d0",
+    "raw_ref": "raw/gemini.stdout.log"
+  },
+  {
+    "task_id": "bench-step5-serial-20260226150448",
+    "provider": "opencode",
+    "finding_id": "MNT-001",
+    "severity": "low",
+    "category": "maintainability",
+    "title": "\u7f3a\u5c11\u7edf\u4e00\u7684\u4ee3\u7801\u98ce\u683c\u4e0e\u9759\u6001\u68c0\u67e5\u57fa\u7ebf",
+    "evidence": {
+      "file": ".",
+      "line": null,
+      "snippet": "\u672a\u53d1\u73b0\u53ef\u9a8c\u8bc1\u7684\u4ed3\u5e93\u7ea7\u683c\u5f0f\u5316/\u9759\u6001\u68c0\u67e5\u57fa\u7ebf\u58f0\u660e\uff08smoke benchmark\uff0c\u65e0\u5de5\u5177\u6a21\u5f0f\uff09",
+      "symbol": null
+    },
+    "recommendation": "\u5728\u4ed3\u5e93\u6839\u76ee\u5f55\u8865\u5145\u5e76\u7edf\u4e00\u7ef4\u62a4\u4ee3\u7801\u8d28\u91cf\u57fa\u7ebf\uff08\u5982\u683c\u5f0f\u5316\u3001lint\u3001\u7c7b\u578b\u68c0\u67e5\u4e0e\u6700\u5c0fCI\u95e8\u7981\uff09\uff0c\u5e76\u5728\u8d21\u732e\u6587\u6863\u4e2d\u660e\u786e\u6267\u884c\u65b9\u5f0f\uff0c\u4ee5\u964d\u4f4e\u540e\u7eed\u7ef4\u62a4\u6210\u672c\u3002",
+    "confidence": 0.51,
+    "fingerprint": "2f0c6e8b7d1a9c4e5b3f8a2d6c7e1b9a4d5f6c7b8a9e0d1c2b3a4f5e6d7c8b9",
+    "raw_ref": "raw/opencode.stdout.log"
+  },
+  {
+    "task_id": "bench-step5-serial-20260226150448",
+    "provider": "qwen",
+    "finding_id": "MAINT-001",
+    "severity": "low",
+    "category": "maintainability",
+    "title": "Inconsistent documentation file naming convention",
+    "evidence": {
+      "file": "README.md",
+      "line": null,
+      "snippet": "Project contains mixed naming: kebab-case (dry-run-plan.md, implementation-gate-checklist.md) vs snake_case (task_plan.md)",
+      "symbol": null
+    },
+    "recommendation": "Standardize documentation file naming to a single convention (preferably kebab-case) for consistency and easier discovery.",
+    "confidence": 0.85,
+    "fingerprint": "maint-doc-naming-conv-001",
+    "raw_ref": "raw/qwen.stdout.log"
+  }
+]

@@ -1,0 +1,74 @@
+[
+  {
+    "task_id": "task-f2bfcbb9539452bc",
+    "provider": "gemini",
+    "finding_id": "MCO-SEC-001",
+    "severity": "high",
+    "category": "security",
+    "title": "Potential Command Injection in binary resolution",
+    "evidence": {
+      "file": "runtime/adapters/shim.py",
+      "line": 196,
+      "snippet": "result = subprocess.run([\"bash\", \"-lc\", f\"command -v {self.binary_name}\"], ...)",
+      "symbol": "_resolve_binary"
+    },
+    "recommendation": "Use shutil.which() for cross-platform binary resolution or avoid shell execution with bash -c. If shell is necessary, use shlex.quote() to sanitize self.binary_name.",
+    "confidence": 0.95,
+    "fingerprint": "c1f2e3d4b5a67890",
+    "raw_ref": "raw/gemini.stdout.log"
+  },
+  {
+    "task_id": "task-f2bfcbb9539452bc",
+    "provider": "gemini",
+    "finding_id": "MCO-SEC-002",
+    "severity": "medium",
+    "category": "security",
+    "title": "Unsanitized sensitive information in log artifacts",
+    "evidence": {
+      "file": "runtime/adapters/shim.py",
+      "line": 102,
+      "snippet": "stdout_file = stdout_path.open(\"w\", encoding=\"utf-8\")\n        stderr_file = stderr_path.open(\"w\", encoding=\"utf-8\")\n        process = subprocess.Popen(\n            cmd,\n            cwd=input_task.repo_root,\n            stdout=stdout_file,\n            stderr=stderr_file,",
+      "symbol": "run"
+    },
+    "recommendation": "Implement a redaction layer to filter sensitive tokens (like API keys or environment variables) from stdout/stderr before writing to artifact files.",
+    "confidence": 0.9,
+    "fingerprint": "a2b3c4d5e6f78901",
+    "raw_ref": "raw/gemini.stdout.log"
+  },
+  {
+    "task_id": "task-f2bfcbb9539452bc",
+    "provider": "gemini",
+    "finding_id": "MCO-MAINT-001",
+    "severity": "medium",
+    "category": "maintainability",
+    "title": "Minimal documentation for provider environment setup",
+    "evidence": {
+      "file": "README.md",
+      "line": 1,
+      "snippet": "# Multi-CLI Orchestrator Docs Index",
+      "symbol": null
+    },
+    "recommendation": "Expand README.md to include prerequisites for each provider (Claude, Codex, etc.), authentication setup, and security best practices for running reviews.",
+    "confidence": 1.0,
+    "fingerprint": "b3c4d5e6f7a89012",
+    "raw_ref": "raw/gemini.stdout.log"
+  },
+  {
+    "task_id": "task-f2bfcbb9539452bc",
+    "provider": "gemini",
+    "finding_id": "MCO-MAINT-002",
+    "severity": "low",
+    "category": "maintainability",
+    "title": "Brittle optional dependency for YAML",
+    "evidence": {
+      "file": "runtime/config.py",
+      "line": 86,
+      "snippet": "try:\n            import yaml  # type: ignore\n        except Exception as exc:\n            raise RuntimeError(\n                \"YAML config requires pyyaml. Install with: pip install pyyaml, or use a .json config.\"\n            ) from exc",
+      "symbol": "load_review_config"
+    },
+    "recommendation": "Provide a requirements.txt or pyproject.toml to formally manage dependencies, or use a more robust check for optional features.",
+    "confidence": 0.9,
+    "fingerprint": "d4e5f6a7b8c90123",
+    "raw_ref": "raw/gemini.stdout.log"
+  }
+]

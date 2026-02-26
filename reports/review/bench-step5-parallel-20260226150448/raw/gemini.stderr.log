@@ -1,0 +1,3 @@
+Warning: unexpected file /Users/tsk/.gemini/extensions/extension-enablement.json in extensions directory.
+failed to start or connect to MCP server 'figma' {"command":"npx","timeout":60000}; 
+McpError: MCP error -32000: Connection closed

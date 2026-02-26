@@ -1,0 +1,6 @@
+Loading extension: conductor (version: 0.3.1)
+MCP STDERR (context7): Context7 Documentation MCP Server v2.1.2 running on stdio
+
+```json
+{"findings":[{"finding_id":"mco-smoke-001","severity":"low","category":"maintainability","title":"Magic String for Configuration Key","evidence":{"file":"runtime/cli.py","line":null,"symbol":null,"snippet":"config = load_config(args.get(\"config\"))"},"recommendation":"Replace the magic string 'config' with a named constant to improve readability and reduce the risk of typos.","confidence":0.0,"fingerprint":"a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2"}]}
+```

@@ -1,0 +1,70 @@
+{
+  "date": "2026-02-26",
+  "providers": [
+    "claude",
+    "codex",
+    "gemini",
+    "opencode",
+    "qwen"
+  ],
+  "cases": [
+    "A1_detect",
+    "B1_capabilities",
+    "C1_run",
+    "F1_normalize",
+    "G_error_taxonomy",
+    "H_retry_semantics"
+  ],
+  "results": [
+    {
+      "provider": "claude",
+      "version": "2.1.59",
+      "A1_detect": true,
+      "B1_capabilities": true,
+      "C1_run": true,
+      "F1_normalize": true,
+      "G_error_taxonomy": true,
+      "H_retry_semantics": true
+    },
+    {
+      "provider": "codex",
+      "version": "0.105.0-alpha.22",
+      "A1_detect": true,
+      "B1_capabilities": true,
+      "C1_run": true,
+      "F1_normalize": true,
+      "G_error_taxonomy": true,
+      "H_retry_semantics": true
+    },
+    {
+      "provider": "gemini",
+      "version": "0.30.0",
+      "A1_detect": true,
+      "B1_capabilities": true,
+      "C1_run": true,
+      "F1_normalize": true,
+      "G_error_taxonomy": true,
+      "H_retry_semantics": true
+    },
+    {
+      "provider": "opencode",
+      "version": "1.2.11",
+      "A1_detect": true,
+      "B1_capabilities": true,
+      "C1_run": true,
+      "F1_normalize": true,
+      "G_error_taxonomy": true,
+      "H_retry_semantics": true
+    },
+    {
+      "provider": "qwen",
+      "version": "0.10.6",
+      "A1_detect": true,
+      "B1_capabilities": true,
+      "C1_run": true,
+      "F1_normalize": true,
+      "G_error_taxonomy": true,
+      "H_retry_semantics": true
+    }
+  ]
+}

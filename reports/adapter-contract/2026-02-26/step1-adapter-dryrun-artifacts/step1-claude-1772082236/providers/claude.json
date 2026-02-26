@@ -1,0 +1,23 @@
+{
+  "provider": "claude",
+  "task_id": "step1-claude-1772082236",
+  "run_id": "claude-a7b1083dcecf",
+  "pid": 91788,
+  "command": [
+    "claude",
+    "-p",
+    "--permission-mode",
+    "plan",
+    "--output-format",
+    "text",
+    "<prompt>"
+  ],
+  "started_at": "2026-02-26T05:03:56.798847+00:00",
+  "completed_at": "2026-02-26T05:04:14.441327+00:00",
+  "exit_code": 0,
+  "success": true,
+  "error_kind": null,
+  "warnings": [],
+  "stdout_path": "/Users/tsk/multi-cli-orchestrator/reports/adapter-contract/2026-02-26/step1-adapter-dryrun-artifacts/step1-claude-1772082236/raw/claude.stdout.log",
+  "stderr_path": "/Users/tsk/multi-cli-orchestrator/reports/adapter-contract/2026-02-26/step1-adapter-dryrun-artifacts/step1-claude-1772082236/raw/claude.stderr.log"
+}

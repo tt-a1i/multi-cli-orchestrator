@@ -1,0 +1,3 @@
+```json
+{"findings":[{"finding_id":"readme-fmt-001","severity":"low","category":"maintainability","title":"README lacks project description, install instructions, and license section","evidence":{"file":"README.md","line":1,"symbol":null,"snippet":"# Multi-CLI Orchestrator Docs Index\n\n## Read First\n1. [multi-cli-orchestrator-proposal.md](./multi-cli-orchestrator-proposal.md)"},"recommendation":"Add a brief project description after the H1 heading, an installation/prerequisites section, and a license section to help new contributors onboard quickly.","confidence":0.85,"fingerprint":"readme-missing-standard-sections-a1b2c3"}]}
+```

@@ -1,0 +1,73 @@
+{
+  "task_id": "bench-parallel2c-20260226",
+  "created_new_task": true,
+  "terminal_state": "PARTIAL_SUCCESS",
+  "decision": "PASS",
+  "provider_results": {
+    "claude": {
+      "success": false,
+      "attempts": 1,
+      "final_error": "retryable_timeout",
+      "deduped_dispatch": false,
+      "parse_ok": false,
+      "parse_reason": "",
+      "schema_valid_count": 0,
+      "dropped_count": 0,
+      "findings_count": 0,
+      "output_path": null
+    },
+    "codex": {
+      "success": false,
+      "attempts": 1,
+      "final_error": "retryable_timeout",
+      "deduped_dispatch": false,
+      "parse_ok": false,
+      "parse_reason": "",
+      "schema_valid_count": 0,
+      "dropped_count": 0,
+      "findings_count": 0,
+      "output_path": null
+    },
+    "gemini": {
+      "success": true,
+      "attempts": 1,
+      "final_error": null,
+      "deduped_dispatch": false,
+      "parse_ok": true,
+      "parse_reason": "ok",
+      "schema_valid_count": 1,
+      "dropped_count": 0,
+      "findings_count": 1,
+      "output_path": "/Users/tsk/multi-cli-orchestrator/reports/review/bench-parallel2c-20260226/providers/gemini.json"
+    },
+    "opencode": {
+      "success": true,
+      "attempts": 1,
+      "final_error": null,
+      "deduped_dispatch": false,
+      "parse_ok": true,
+      "parse_reason": "ok",
+      "schema_valid_count": 1,
+      "dropped_count": 0,
+      "findings_count": 1,
+      "output_path": "/Users/tsk/multi-cli-orchestrator/reports/review/bench-parallel2c-20260226/providers/opencode.json"
+    },
+    "qwen": {
+      "success": true,
+      "attempts": 1,
+      "final_error": null,
+      "deduped_dispatch": false,
+      "parse_ok": true,
+      "parse_reason": "ok",
+      "schema_valid_count": 1,
+      "dropped_count": 0,
+      "findings_count": 1,
+      "output_path": "/Users/tsk/multi-cli-orchestrator/reports/review/bench-parallel2c-20260226/providers/qwen.json"
+    }
+  },
+  "findings_count": 3,
+  "parse_success_count": 3,
+  "parse_failure_count": 2,
+  "schema_valid_count": 3,
+  "dropped_findings_count": 0
+}

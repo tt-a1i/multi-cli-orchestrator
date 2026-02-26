@@ -1,0 +1,19 @@
+{
+  "provider": "gemini",
+  "task_id": "bench-parallel2c-20260226",
+  "run_id": "gemini-4834e449ebc3",
+  "pid": 21346,
+  "command": [
+    "gemini",
+    "-p",
+    "<prompt>"
+  ],
+  "started_at": "2026-02-26T06:50:18.444282+00:00",
+  "completed_at": "2026-02-26T06:50:46.060621+00:00",
+  "exit_code": 0,
+  "success": true,
+  "error_kind": null,
+  "warnings": [],
+  "stdout_path": "/Users/tsk/multi-cli-orchestrator/reports/review/bench-parallel2c-20260226/raw/gemini.stdout.log",
+  "stderr_path": "/Users/tsk/multi-cli-orchestrator/reports/review/bench-parallel2c-20260226/raw/gemini.stderr.log"
+}

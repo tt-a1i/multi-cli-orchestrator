@@ -1,0 +1,4 @@
+Loaded cached credentials.
+Loading extension: conductor
+Error during discovery for MCP server 'figma': MCP error -32000: Connection closedServer 'context7' supports tool updates. Listening for changes...
+Error executing tool run_shell_command: Tool "run_shell_command" not found. Did you mean one of: "grep_search", "cli_help", "read_file"?

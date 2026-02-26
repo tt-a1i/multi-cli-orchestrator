@@ -1,0 +1,9 @@
+{
+  "type": "object",
+  "properties": {
+    "probe": { "type": "string" },
+    "ok": { "type": "boolean" }
+  },
+  "required": ["probe", "ok"],
+  "additionalProperties": false
+}

@@ -1,0 +1,27 @@
+{
+  "provider": "codex",
+  "task_id": "step1-codex-1772082254",
+  "run_id": "codex-c65dc2316b7e",
+  "pid": 91977,
+  "command": [
+    "codex",
+    "exec",
+    "--skip-git-repo-check",
+    "-C",
+    "<repo_root>",
+    "--sandbox",
+    "workspace-write",
+    "--json",
+    "<prompt>"
+  ],
+  "started_at": "2026-02-26T05:04:14.444497+00:00",
+  "completed_at": "2026-02-26T05:04:29.549038+00:00",
+  "exit_code": 1,
+  "success": true,
+  "error_kind": null,
+  "warnings": [
+    "provider_warning_mcp_startup"
+  ],
+  "stdout_path": "/Users/tsk/multi-cli-orchestrator/reports/adapter-contract/2026-02-26/step1-adapter-dryrun-artifacts/step1-codex-1772082254/raw/codex.stdout.log",
+  "stderr_path": "/Users/tsk/multi-cli-orchestrator/reports/adapter-contract/2026-02-26/step1-adapter-dryrun-artifacts/step1-codex-1772082254/raw/codex.stderr.log"
+}

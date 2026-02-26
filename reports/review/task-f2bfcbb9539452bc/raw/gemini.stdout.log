@@ -1,0 +1,78 @@
+我将对代码库进行深入调研，特别是针对 `README.md` 和 `runtime/` 脚本中的维护性和安全性问题。
+
+我将分析 `runtime/` 目录下的核心逻辑，重点检查安全性（如 `subprocess` 调用、密钥管理、路径校验）和维护性（如错误处理和配置管理）。
+
+我正在分析 `runtime/` 目录中的代码安全性，特别关注 `subprocess` 调用中的命令注入风险、敏感信息泄露（如日志中的 API 密钥）以及配置解析中的潜在问题。
+
+我正在整理发现的安全和维护性问题。主要包括：`shim.py` 中的潜在命令注入漏洞、`command_override` 可能导致的任意命令执行、日志中敏感信息暴露风险、以及 `README.md` 文档不足和 YAML 依赖处理不健壮等问题。接下来，我将检查项目根目录下的依赖定义文件（如 `requirements.txt` 或 `setup.py`）。
+
+根目录下没有 `requirements.txt` 或 `setup.py`。`mco` 文件似乎是入口点，我将检查其内容。
+
+我已完成对代码库的审查。目前发现的问题包括：`ShimAdapterBase._resolve_binary` 中由于使用 f-string 配合 `bash -lc` 导致的潜在命令注入风险（High）；虽然目前无法通过配置文件直接触发，但 `command_override` 逻辑在设计上存在允许执行任意命令的风险（Medium/Critical）；日志文件未经过脱敏处理，可能泄露 API 密钥等敏感信息（Medium）；此外，`README.md` 缺乏详细的设置和安全说明，且 YAML 依赖管理较为脆弱。我将按照要求的 JSON 格式输出这些发现。
+
+```json
+{
+  "findings": [
+    {
+      "finding_id": "MCO-SEC-001",
+      "severity": "high",
+      "category": "security",
+      "title": "Potential Command Injection in binary resolution",
+      "evidence": {
+        "file": "runtime/adapters/shim.py",
+        "line": 196,
+        "symbol": "_resolve_binary",
+        "snippet": "result = subprocess.run([\"bash\", \"-lc\", f\"command -v {self.binary_name}\"], ...)"
+      },
+      "recommendation": "Use shutil.which() for cross-platform binary resolution or avoid shell execution with bash -c. If shell is necessary, use shlex.quote() to sanitize self.binary_name.",
+      "confidence": 0.95,
+      "fingerprint": "c1f2e3d4b5a67890"
+    },
+    {
+      "finding_id": "MCO-SEC-002",
+      "severity": "medium",
+      "category": "security",
+      "title": "Unsanitized sensitive information in log artifacts",
+      "evidence": {
+        "file": "runtime/adapters/shim.py",
+        "line": 102,
+        "symbol": "run",
+        "snippet": "stdout_file = stdout_path.open(\"w\", encoding=\"utf-8\")\n        stderr_file = stderr_path.open(\"w\", encoding=\"utf-8\")\n        process = subprocess.Popen(\n            cmd,\n            cwd=input_task.repo_root,\n            stdout=stdout_file,\n            stderr=stderr_file,"
+      },
+      "recommendation": "Implement a redaction layer to filter sensitive tokens (like API keys or environment variables) from stdout/stderr before writing to artifact files.",
+      "confidence": 0.9,
+      "fingerprint": "a2b3c4d5e6f78901"
+    },
+    {
+      "finding_id": "MCO-MAINT-001",
+      "severity": "medium",
+      "category": "maintainability",
+      "title": "Minimal documentation for provider environment setup",
+      "evidence": {
+        "file": "README.md",
+        "line": 1,
+        "symbol": null,
+        "snippet": "# Multi-CLI Orchestrator Docs Index"
+      },
+      "recommendation": "Expand README.md to include prerequisites for each provider (Claude, Codex, etc.), authentication setup, and security best practices for running reviews.",
+      "confidence": 1.0,
+      "fingerprint": "b3c4d5e6f7a89012"
+    },
+    {
+      "finding_id": "MCO-MAINT-002",
+      "severity": "low",
+      "category": "maintainability",
+      "title": "Brittle optional dependency for YAML",
+      "evidence": {
+        "file": "runtime/config.py",
+        "line": 86,
+        "symbol": "load_review_config",
+        "snippet": "try:\n            import yaml  # type: ignore\n        except Exception as exc:\n            raise RuntimeError(\n                \"YAML config requires pyyaml. Install with: pip install pyyaml, or use a .json config.\"\n            ) from exc"
+      },
+      "recommendation": "Provide a requirements.txt or pyproject.toml to formally manage dependencies, or use a more robust check for optional features.",
+      "confidence": 0.9,
+      "fingerprint": "d4e5f6a7b8c90123"
+    }
+  ]
+}
+```

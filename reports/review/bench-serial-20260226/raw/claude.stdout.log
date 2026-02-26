@@ -1,0 +1,3 @@
+```json
+{"findings":[{"finding_id":"MAINT-001","severity":"low","category":"maintainability","title":"Repository missing standardized CLAUDE.md project instructions","evidence":{"file":"CLAUDE.md","line":null,"symbol":null,"snippet":"(file not found)"},"recommendation":"Add a project-level CLAUDE.md with build commands, test instructions, and architecture notes to improve onboarding and AI-assisted development consistency.","confidence":0.6,"fingerprint":"a1b2c3d4e5f6"}]}
+```

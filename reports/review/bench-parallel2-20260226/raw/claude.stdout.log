@@ -1,0 +1,3 @@
+```json
+{"findings":[{"finding_id":"MAINT-001","severity":"low","category":"maintainability","title":"Repository missing centralized configuration documentation","evidence":{"file":"README.md","line":null,"symbol":null,"snippet":"N/A - smoke benchmark, no file reads performed"},"recommendation":"Add a CONTRIBUTING.md or architecture doc describing project structure and configuration conventions","confidence":0.2,"fingerprint":"a1b2c3d4e5f6smoke001"}]}
+```

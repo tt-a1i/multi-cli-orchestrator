@@ -1,0 +1,74 @@
+[
+  {
+    "task_id": "bench-parallel2d-20260226",
+    "provider": "codex",
+    "finding_id": "maint-parse-timeout-magic-number",
+    "severity": "low",
+    "category": "maintainability",
+    "title": "Default timeout value is hardcoded instead of centrally defined",
+    "evidence": {
+      "file": "src/parse-candidate.ts",
+      "line": null,
+      "snippet": "const timeoutMs = timeoutOverride ?? 30000;",
+      "symbol": null
+    },
+    "recommendation": "Extract the default timeout into a named shared constant/config (e.g., DEFAULT_PARSE_TIMEOUT_MS) and reference it here to reduce duplication and ease future tuning.",
+    "confidence": 0.62,
+    "fingerprint": "d9b4c3e17a9d4f2d5e2c7a91b0f6c4a8e3d2f1b7",
+    "raw_ref": "raw/codex.stdout.log"
+  },
+  {
+    "task_id": "bench-parallel2d-20260226",
+    "provider": "gemini",
+    "finding_id": "parsing-validation-redundancy",
+    "severity": "low",
+    "category": "maintainability",
+    "title": "Redundant manual type checking in parsing logic",
+    "evidence": {
+      "file": "runtime/adapters/parsing.py",
+      "line": 108,
+      "snippet": "def _validate_finding_item(item: Any) -> Tuple[bool, Optional[Dict[str, Any]]]:",
+      "symbol": "_validate_finding_item"
+    },
+    "recommendation": "Consolidate validation logic by using a centralized data model or schema validator to reduce manual type checks and ensure consistency between contract inspection and finding normalization.",
+    "confidence": 0.9,
+    "fingerprint": "8c2e4f7a9b1d6e3c",
+    "raw_ref": "raw/gemini.stdout.log"
+  },
+  {
+    "task_id": "bench-parallel2d-20260226",
+    "provider": "opencode",
+    "finding_id": "MB-LOW-MAINT-001",
+    "severity": "low",
+    "category": "maintainability",
+    "title": "\u8d85\u65f6\u8986\u76d6\u503c\u89e3\u6790\u903b\u8f91\u5206\u6563\uff0c\u540e\u7eed\u4fee\u6539\u6210\u672c\u9ad8",
+    "evidence": {
+      "file": "src/benchmark/smoke.ts",
+      "line": null,
+      "snippet": "const timeoutMs = Number(process.env.SMOKE_TIMEOUT_MS ?? args.timeout ?? DEFAULT_TIMEOUT_MS);",
+      "symbol": null
+    },
+    "recommendation": "\u5c06\u8d85\u65f6\u8986\u76d6\u503c\u89e3\u6790\u4e0e\u6821\u9a8c\u63d0\u53d6\u4e3a\u5355\u4e00\u516c\u5171\u51fd\u6570\uff08\u5982 `resolveTimeoutMs`\uff09\uff0c\u7531 smoke benchmark \u4e0e parse-candidate \u76f8\u5173\u8c03\u7528\u65b9\u7edf\u4e00\u590d\u7528\uff0c\u5e76\u96c6\u4e2d\u5904\u7406\u9ed8\u8ba4\u503c\u3001\u7c7b\u578b\u8f6c\u6362\u4e0e\u8fb9\u754c\u6821\u9a8c\u3002",
+    "confidence": 0.52,
+    "fingerprint": "8b8d6f1f2f6b7e1f4c4f3ea4d9c4e6f7a9b2c1d3",
+    "raw_ref": "raw/opencode.stdout.log"
+  },
+  {
+    "task_id": "bench-parallel2d-20260226",
+    "provider": "qwen",
+    "finding_id": "SMOKE-001",
+    "severity": "low",
+    "category": "maintainability",
+    "title": "Parse candidate fix lacks timeout override documentation",
+    "evidence": {
+      "file": "mco",
+      "line": null,
+      "snippet": "timeout override behavior not documented in parse-candidate",
+      "symbol": null
+    },
+    "recommendation": "Add inline documentation for timeout override parameter in parse-candidate function",
+    "confidence": 0.7,
+    "fingerprint": "smoke-benchmark-parse-candidate-timeout-001",
+    "raw_ref": "raw/qwen.stdout.log"
+  }
+]

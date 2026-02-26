@@ -1,0 +1,19 @@
+{
+  "provider": "gemini",
+  "task_id": "task-b234caf82d5b25e0",
+  "run_id": "gemini-64527f0ff17a",
+  "pid": 5791,
+  "command": [
+    "gemini",
+    "-p",
+    "<prompt>"
+  ],
+  "started_at": "2026-02-26T05:54:56.729703+00:00",
+  "completed_at": "2026-02-26T05:55:25.394090+00:00",
+  "exit_code": 0,
+  "success": true,
+  "error_kind": null,
+  "warnings": [],
+  "stdout_path": "/Users/tsk/multi-cli-orchestrator/reports/review/task-b234caf82d5b25e0/raw/gemini.stdout.log",
+  "stderr_path": "/Users/tsk/multi-cli-orchestrator/reports/review/task-b234caf82d5b25e0/raw/gemini.stderr.log"
+}

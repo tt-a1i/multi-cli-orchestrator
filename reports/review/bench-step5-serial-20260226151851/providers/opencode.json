@@ -1,0 +1,21 @@
+{
+  "provider": "opencode",
+  "task_id": "bench-step5-serial-20260226151851",
+  "run_id": "opencode-3547c25e7ba0",
+  "pid": 32183,
+  "command": [
+    "opencode",
+    "run",
+    "<prompt>",
+    "--format",
+    "json"
+  ],
+  "started_at": "2026-02-26T07:20:30.422188+00:00",
+  "completed_at": "2026-02-26T07:20:48.682418+00:00",
+  "exit_code": 0,
+  "success": true,
+  "error_kind": null,
+  "warnings": [],
+  "stdout_path": "/Users/tsk/multi-cli-orchestrator/reports/review/bench-step5-serial-20260226151851/raw/opencode.stdout.log",
+  "stderr_path": "/Users/tsk/multi-cli-orchestrator/reports/review/bench-step5-serial-20260226151851/raw/opencode.stderr.log"
+}

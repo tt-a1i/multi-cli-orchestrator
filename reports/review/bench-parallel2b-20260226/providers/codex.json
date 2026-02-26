@@ -1,0 +1,25 @@
+{
+  "provider": "codex",
+  "task_id": "bench-parallel2b-20260226",
+  "run_id": "codex-895776d916c4",
+  "pid": 18166,
+  "command": [
+    "codex",
+    "exec",
+    "--skip-git-repo-check",
+    "-C",
+    "<repo_root>",
+    "--sandbox",
+    "workspace-write",
+    "--json",
+    "<prompt>"
+  ],
+  "started_at": "2026-02-26T06:35:51.533439+00:00",
+  "completed_at": "2026-02-26T06:36:09.515677+00:00",
+  "exit_code": 0,
+  "success": true,
+  "error_kind": null,
+  "warnings": [],
+  "stdout_path": "/Users/tsk/multi-cli-orchestrator/reports/review/bench-parallel2b-20260226/raw/codex.stdout.log",
+  "stderr_path": "/Users/tsk/multi-cli-orchestrator/reports/review/bench-parallel2b-20260226/raw/codex.stderr.log"
+}

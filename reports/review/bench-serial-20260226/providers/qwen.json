@@ -1,0 +1,22 @@
+{
+  "provider": "qwen",
+  "task_id": "bench-serial-20260226",
+  "run_id": "qwen-c7e225848d3c",
+  "pid": 16864,
+  "command": [
+    "qwen",
+    "<prompt>",
+    "--output-format",
+    "json",
+    "--auth-type",
+    "qwen-oauth"
+  ],
+  "started_at": "2026-02-26T06:33:41.014599+00:00",
+  "completed_at": "2026-02-26T06:33:57.748146+00:00",
+  "exit_code": 0,
+  "success": true,
+  "error_kind": null,
+  "warnings": [],
+  "stdout_path": "/Users/tsk/multi-cli-orchestrator/reports/review/bench-serial-20260226/raw/qwen.stdout.log",
+  "stderr_path": "/Users/tsk/multi-cli-orchestrator/reports/review/bench-serial-20260226/raw/qwen.stderr.log"
+}

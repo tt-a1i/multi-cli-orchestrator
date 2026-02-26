@@ -1,0 +1,68 @@
+{
+  "task_id": "task-f2bfcbb9539452bc",
+  "created_new_task": true,
+  "terminal_state": "PARTIAL_SUCCESS",
+  "decision": "ESCALATE",
+  "provider_results": {
+    "claude": {
+      "success": false,
+      "attempts": 1,
+      "final_error": "retryable_timeout",
+      "deduped_dispatch": false,
+      "parse_ok": false,
+      "schema_valid_count": 0,
+      "dropped_count": 0,
+      "findings_count": 0,
+      "output_path": null
+    },
+    "codex": {
+      "success": false,
+      "attempts": 1,
+      "final_error": "retryable_timeout",
+      "deduped_dispatch": false,
+      "parse_ok": false,
+      "schema_valid_count": 0,
+      "dropped_count": 0,
+      "findings_count": 0,
+      "output_path": null
+    },
+    "gemini": {
+      "success": true,
+      "attempts": 1,
+      "final_error": null,
+      "deduped_dispatch": false,
+      "parse_ok": true,
+      "schema_valid_count": 4,
+      "dropped_count": 0,
+      "findings_count": 4,
+      "output_path": "/Users/tsk/multi-cli-orchestrator/reports/review/task-f2bfcbb9539452bc/providers/gemini.json"
+    },
+    "opencode": {
+      "success": false,
+      "attempts": 1,
+      "final_error": "normalization_error",
+      "deduped_dispatch": false,
+      "parse_ok": false,
+      "schema_valid_count": 0,
+      "dropped_count": 0,
+      "findings_count": 0,
+      "output_path": "/Users/tsk/multi-cli-orchestrator/reports/review/task-f2bfcbb9539452bc/providers/opencode.json"
+    },
+    "qwen": {
+      "success": false,
+      "attempts": 1,
+      "final_error": "normalization_error",
+      "deduped_dispatch": false,
+      "parse_ok": false,
+      "schema_valid_count": 0,
+      "dropped_count": 0,
+      "findings_count": 0,
+      "output_path": "/Users/tsk/multi-cli-orchestrator/reports/review/task-f2bfcbb9539452bc/providers/qwen.json"
+    }
+  },
+  "findings_count": 4,
+  "parse_success_count": 1,
+  "parse_failure_count": 4,
+  "schema_valid_count": 4,
+  "dropped_findings_count": 0
+}

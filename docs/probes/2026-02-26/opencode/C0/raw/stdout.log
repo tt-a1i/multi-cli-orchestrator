@@ -1,0 +1,14 @@
+┌  Credentials [90m~/.local/share/opencode/auth.json
+│
+●  Google [90moauth
+│
+●  claude-opus-4-5-20251101 [90mapi
+│
+└  2 credentials
+
+┌  Environment
+│
+●  Anthropic [90mANTHROPIC_API_KEY
+│
+└  1 environment variable
+

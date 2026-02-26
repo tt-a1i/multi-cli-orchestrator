@@ -1,0 +1,79 @@
+{
+  "findings": [
+    {
+      "finding_id": "MCO-001",
+      "severity": "critical",
+      "category": "bug",
+      "title": "Retry logic computes delay but never sleeps",
+      "evidence": {
+        "file": "runtime/orchestrator.py",
+        "line": 184,
+        "symbol": "OrchestratorRuntime.run_with_retry",
+        "snippet": "            retry_index = attempts\n            delays.append(self.retry_policy.compute_delay(retry_index))"
+      },
+      "recommendation": "Add 'time.sleep(delays[-1])' after computing the delay to ensure the backoff is actually applied before the next attempt.",
+      "confidence": 1.0,
+      "fingerprint": "8b5f1c2a3d4e5f6a"
+    },
+    {
+      "finding_id": "MCO-002",
+      "severity": "high",
+      "category": "maintainability",
+      "title": "Memory leak of ShimRunHandle objects in ShimAdapterBase",
+      "evidence": {
+        "file": "runtime/adapters/shim.py",
+        "line": 113,
+        "symbol": "ShimAdapterBase.poll",
+        "snippet": "    def poll(self, ref: TaskRunRef) -> TaskStatus:\n        handle = self._runs.get(ref.run_id)\n        if handle is None:\n            return TaskStatus(...)"
+      },
+      "recommendation": "Remove the run handle from 'self._runs' after the process has completed and its state has been persisted.",
+      "confidence": 1.0,
+      "fingerprint": "1a2b3c4d5e6f7g8h"
+    },
+    {
+      "finding_id": "MCO-003",
+      "severity": "medium",
+      "category": "bug",
+      "title": "Naive JSON extraction misses multi-line JSON payloads",
+      "evidence": {
+        "file": "runtime/adapters/parsing.py",
+        "line": 42,
+        "symbol": "extract_json_payloads",
+        "snippet": "    for line in text.splitlines():\n        candidate = line.strip()\n        if not candidate.startswith(\"{\"):\n            continue\n        try:\n            add_payload(json.loads(candidate))"
+      },
+      "recommendation": "Use a more robust JSON extraction method that handles multi-line JSON or properly identifies JSON boundaries within unstructured text, such as a streaming parser or better regex.",
+      "confidence": 0.9,
+      "fingerprint": "2c3d4e5f6g7h8i9j"
+    },
+    {
+      "finding_id": "MCO-004",
+      "severity": "medium",
+      "category": "test-gap",
+      "title": "Retry semantics tests do not verify timing/delay",
+      "evidence": {
+        "file": "tests/test_retry_semantics.py",
+        "line": 12,
+        "symbol": "RetrySemanticsTests.test_retry_then_success",
+        "snippet": "    def test_retry_then_success(self) -> None:\n        runtime = OrchestratorRuntime(RetryPolicy(max_retries=2, base_delay_seconds=1.0, backoff_multiplier=2.0))\n        ...\n        result = runtime.run_with_retry(\"task-1\", \"claude\", \"dispatch-1\", runner)\n        self.assertTrue(result.success)\n        self.assertEqual(result.attempts, 2)"
+      },
+      "recommendation": "Mock 'time.sleep' in tests and verify that it is called with the expected delay values to ensure backoff logic is functionally correct.",
+      "confidence": 0.95,
+      "fingerprint": "3d4e5f6g7h8i9j0k"
+    },
+    {
+      "finding_id": "MCO-005",
+      "severity": "low",
+      "category": "maintainability",
+      "title": "Hardcoded provider whitelist in CLI main function",
+      "evidence": {
+        "file": "runtime/cli.py",
+        "line": 52,
+        "symbol": "main",
+        "snippet": "    cfg = _resolve_config(args)\n    repo_root = str(Path(args.repo).resolve())\n    providers = [item for item in cfg.providers if item in (\"claude\", \"codex\", \"gemini\", \"opencode\", \"qwen\")]"
+      },
+      "recommendation": "Use the provider registry from 'review_engine.py' to validate providers instead of hardcoding the list in 'cli.py' to ensure consistency when adding new adapters.",
+      "confidence": 0.9,
+      "fingerprint": "4e5f6g7h8i9j0k1l"
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{"type":"thread.started","thread_id":"019c9855-5291-7901-a0f2-19356cb10392"}
+{"type":"error","message":"MCP client for `figma` failed to start: request timed out"}
+{"type":"error","message":"MCP client for `supabase` failed to start: handshaking with MCP server failed: Send message error Transport [rmcp::transport::worker::WorkerTransport<rmcp::transport::streamable_http_client::StreamableHttpClientWorker<rmcp::transport::auth::AuthClient<reqwest::async_impl::client::Client>>>] error: Auth required, when send initialize request"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"reasoning","text":"OK"}}
+{"type":"item.completed","item":{"id":"item_1","type":"agent_message","text":"OK"}}
+{"type":"turn.completed","usage":{"input_tokens":5502,"cached_input_tokens":0,"output_tokens":18}}

@@ -1,0 +1,3 @@
+```json
+{"findings":[{"finding_id":"MAINT-001","severity":"low","category":"maintainability","title":"Repository lacks git version control initialization","evidence":{"file":".","line":null,"symbol":null,"snippet":"Is a git repository: false"},"recommendation":"Initialize git with `git init` and create an initial commit to enable change tracking, branching, and collaboration workflows.","confidence":0.95,"fingerprint":"a1b2c3d4e5f6-no-git-init"}]}
+```

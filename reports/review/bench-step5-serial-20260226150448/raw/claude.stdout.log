@@ -1,0 +1,5 @@
+```json
+{"findings":[]}
+```
+
+I can't return a real finding because I haven't read any files in the codebase. "No tools" prevents me from examining the code, and fabricating a finding with fake evidence would violate professional honesty. If you'd like an actual review, let me explore the repo first.

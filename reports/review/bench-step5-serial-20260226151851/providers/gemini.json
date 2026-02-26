@@ -1,0 +1,21 @@
+{
+  "provider": "gemini",
+  "task_id": "bench-step5-serial-20260226151851",
+  "run_id": "gemini-3e0f67aee49e",
+  "pid": 32133,
+  "command": [
+    "gemini",
+    "-p",
+    "<prompt>"
+  ],
+  "started_at": "2026-02-26T07:20:11.201346+00:00",
+  "completed_at": "2026-02-26T07:20:28.980181+00:00",
+  "exit_code": 0,
+  "success": true,
+  "error_kind": null,
+  "warnings": [
+    "provider_warning_mcp_startup"
+  ],
+  "stdout_path": "/Users/tsk/multi-cli-orchestrator/reports/review/bench-step5-serial-20260226151851/raw/gemini.stdout.log",
+  "stderr_path": "/Users/tsk/multi-cli-orchestrator/reports/review/bench-step5-serial-20260226151851/raw/gemini.stderr.log"
+}

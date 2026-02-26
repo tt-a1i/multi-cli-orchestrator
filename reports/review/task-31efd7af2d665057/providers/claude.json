@@ -1,0 +1,23 @@
+{
+  "provider": "claude",
+  "task_id": "task-31efd7af2d665057",
+  "run_id": "claude-8d7b769d15bc",
+  "pid": 94477,
+  "command": [
+    "claude",
+    "-p",
+    "--permission-mode",
+    "plan",
+    "--output-format",
+    "text",
+    "<prompt>"
+  ],
+  "started_at": "2026-02-26T05:15:53.251762+00:00",
+  "completed_at": "2026-02-26T05:16:45.749405+00:00",
+  "exit_code": 0,
+  "success": true,
+  "error_kind": null,
+  "warnings": [],
+  "stdout_path": "/Users/tsk/multi-cli-orchestrator/reports/review/task-31efd7af2d665057/raw/claude.stdout.log",
+  "stderr_path": "/Users/tsk/multi-cli-orchestrator/reports/review/task-31efd7af2d665057/raw/claude.stderr.log"
+}

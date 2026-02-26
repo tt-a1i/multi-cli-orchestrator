@@ -1,0 +1,5 @@
+{"type":"thread.started","thread_id":"019c9894-c593-7c13-980f-13a753abafbf"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"reasoning","text":"**Preparing final JSON response**"}}
+{"type":"item.completed","item":{"id":"item_1","type":"agent_message","text":"{\"ok\":true,\"probe\":\"c2\"}"}}
+{"type":"turn.completed","usage":{"input_tokens":13481,"cached_input_tokens":2560,"output_tokens":60}}

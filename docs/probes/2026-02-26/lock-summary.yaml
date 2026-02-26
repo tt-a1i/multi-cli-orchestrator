@@ -1,0 +1,41 @@
+provider_locks:
+  claude:
+    min_version:
+      macos: "2.1.59"
+    required_capability_status:
+      C0: PASS
+      C1: PASS
+      C2: PASS
+    gate_status: ENABLED
+  codex:
+    min_version:
+      macos: "0.105.0"
+    required_capability_status:
+      C0: PASS
+      C1: PASS
+      C2: PASS
+    gate_status: ENABLED
+  gemini:
+    min_version:
+      macos: "0.30.0"
+    required_capability_status:
+      C0: PASS
+      C1: PASS
+      C2: PASS
+    gate_status: ENABLED
+  opencode:
+    min_version:
+      macos: "1.2.14"
+    required_capability_status:
+      C0: PASS
+      C1: PASS
+      C2: PASS
+    gate_status: ENABLED
+  qwen:
+    min_version:
+      macos: "0.10.6"
+    required_capability_status:
+      C0: PASS
+      C1: PASS
+      C2: PASS
+    gate_status: ENABLED

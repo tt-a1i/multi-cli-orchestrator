@@ -1,0 +1,92 @@
+[
+  {
+    "task_id": "bench-step5-serial-20260226151851",
+    "provider": "claude",
+    "finding_id": "MAINT-001",
+    "severity": "low",
+    "category": "maintainability",
+    "title": "No codebase inspection performed \u2014 unable to produce evidence-backed finding",
+    "evidence": {
+      "file": ".",
+      "line": null,
+      "snippet": "N/A \u2014 no tools invoked per request constraint",
+      "symbol": null
+    },
+    "recommendation": "Re-run with tool access enabled to produce real, evidence-based findings",
+    "confidence": 0.0,
+    "fingerprint": "a1b2c3d4e5f6",
+    "raw_ref": "raw/claude.stdout.log"
+  },
+  {
+    "task_id": "bench-step5-serial-20260226151851",
+    "provider": "codex",
+    "finding_id": "MNT-001",
+    "severity": "low",
+    "category": "maintainability",
+    "title": "Repository lacks a dedicated contributor/maintenance guide",
+    "evidence": {
+      "file": "README.md",
+      "line": null,
+      "snippet": "The repository does not provide a centralized CONTRIBUTING/maintenance workflow reference for coding standards, review, and release hygiene.",
+      "symbol": null
+    },
+    "recommendation": "Add a `CONTRIBUTING.md` (and link it from `README.md`) that documents coding conventions, review checklist, test/lint expectations, and release steps to reduce tribal knowledge and onboarding friction.",
+    "confidence": 0.71,
+    "fingerprint": "f3f8a0d6c9d44e1ab0b0f2f4dd1f8f4e",
+    "raw_ref": "raw/codex.stdout.log"
+  },
+  {
+    "task_id": "bench-step5-serial-20260226151851",
+    "provider": "gemini",
+    "finding_id": "smoke-benchmark-low-maintainability",
+    "severity": "low",
+    "category": "maintainability",
+    "title": "Hardcoded Configuration Value",
+    "evidence": {
+      "file": "runtime/config.py",
+      "line": null,
+      "snippet": "DEFAULT_TIMEOUT = 30",
+      "symbol": null
+    },
+    "recommendation": "The default timeout is hardcoded. It should be defined in a configuration file or as a named constant to improve configurability and maintainability.",
+    "confidence": 0.0,
+    "fingerprint": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2",
+    "raw_ref": "raw/gemini.stdout.log"
+  },
+  {
+    "task_id": "bench-step5-serial-20260226151851",
+    "provider": "opencode",
+    "finding_id": "MNT-001",
+    "severity": "low",
+    "category": "maintainability",
+    "title": "\u7f3a\u5c11\u660e\u786e\u7684\u9879\u76ee\u7ea7\u7ef4\u62a4\u8bf4\u660e\u5165\u53e3",
+    "evidence": {
+      "file": ".",
+      "line": null,
+      "snippet": "\u5f53\u524d\u5ba1\u9605\u8303\u56f4\u4ec5\u6307\u5411\u9879\u76ee\u6839\u76ee\u5f55\uff0c\u672a\u4f53\u73b0\u7a33\u5b9a\u7684\u7ef4\u62a4\u5165\u53e3\u6587\u6863\uff08\u5982\u7edf\u4e00\u7684\u8d21\u732e/\u67b6\u6784\u8bf4\u660e\uff09\u3002",
+      "symbol": null
+    },
+    "recommendation": "\u5728\u9879\u76ee\u6839\u76ee\u5f55\u589e\u52a0\u5e76\u7ef4\u62a4\u7edf\u4e00\u5165\u53e3\u6587\u6863\uff08\u4f8b\u5982 `README.md` \u6216 `CONTRIBUTING.md`\uff09\uff0c\u5305\u542b\u76ee\u5f55\u7ed3\u6784\u3001\u5f00\u53d1\u547d\u4ee4\u3001\u4ee3\u7801\u89c4\u8303\u4e0e\u8bc4\u5ba1\u6d41\u7a0b\uff0c\u964d\u4f4e\u540e\u7eed\u7ef4\u62a4\u6210\u672c\u3002",
+    "confidence": 0.54,
+    "fingerprint": "f2e8fbb2d7e40bb6f7f57eb85d82d5392f25bd17660f2d16dd84f77fd2f43686",
+    "raw_ref": "raw/opencode.stdout.log"
+  },
+  {
+    "task_id": "bench-step5-serial-20260226151851",
+    "provider": "qwen",
+    "finding_id": "MAINT-001",
+    "severity": "low",
+    "category": "maintainability",
+    "title": "Configuration files scattered at project root",
+    "evidence": {
+      "file": "mco.example.json",
+      "line": null,
+      "snippet": "mco.example.json, mco.step3-baseline.json at root level",
+      "symbol": null
+    },
+    "recommendation": "Consolidate example and baseline JSON files into a dedicated config/ or examples/ directory for improved project organization",
+    "confidence": 0.7,
+    "fingerprint": "maint-config-scatter-a3f2b9c1",
+    "raw_ref": "raw/qwen.stdout.log"
+  }
+]

@@ -1,0 +1,13 @@
+{
+  "artifacts": [
+    "reports/dry-run/2026-02-26/providers/claude_run_a.json",
+    "reports/dry-run/2026-02-26/providers/claude_run_b.json",
+    "reports/dry-run/2026-02-26/providers/codex_run_a.json",
+    "reports/dry-run/2026-02-26/providers/codex_run_b.json",
+    "reports/dry-run/2026-02-26/raw/claude_run_a.err",
+    "reports/dry-run/2026-02-26/raw/claude_run_b.err",
+    "reports/dry-run/2026-02-26/raw/codex_run_a.err",
+    "reports/dry-run/2026-02-26/raw/codex_run_b.err",
+    "reports/dry-run/2026-02-26/idempotency_key.txt"
+  ]
+}

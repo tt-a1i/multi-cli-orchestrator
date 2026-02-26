@@ -1,0 +1,5 @@
+{"type":"thread.started","thread_id":"019c98b7-6e8a-7a23-a2b6-f0cb37108fc2"}
+{"type":"turn.started"}
+{"type":"item.completed","item":{"id":"item_0","type":"reasoning","text":"**Generating maintainability finding JSON**"}}
+{"type":"item.completed","item":{"id":"item_1","type":"agent_message","text":"{\"findings\":[{\"finding_id\":\"maint-parse-timeout-magic-number\",\"severity\":\"low\",\"category\":\"maintainability\",\"title\":\"Default timeout value is hardcoded instead of centrally defined\",\"evidence\":{\"file\":\"src/parse-candidate.ts\",\"line\":null,\"symbol\":null,\"snippet\":\"const timeoutMs = timeoutOverride ?? 30000;\"},\"recommendation\":\"Extract the default timeout into a named shared constant/config (e.g., DEFAULT_PARSE_TIMEOUT_MS) and reference it here to reduce duplication and ease future tuning.\",\"confidence\":0.62,\"fingerprint\":\"d9b4c3e17a9d4f2d5e2c7a91b0f6c4a8e3d2f1b7\"}]}"}}
+{"type":"turn.completed","usage":{"input_tokens":13599,"cached_input_tokens":3456,"output_tokens":604}}

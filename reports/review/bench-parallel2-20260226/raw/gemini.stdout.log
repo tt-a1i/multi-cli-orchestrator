@@ -1,0 +1,19 @@
+{
+  "findings": [
+    {
+      "finding_id": "MCO-MNT-01",
+      "severity": "low",
+      "category": "maintainability",
+      "title": "Shell scripts lack strict error handling flags",
+      "evidence": {
+        "file": "scripts/run_capability_probes.sh",
+        "line": 1,
+        "symbol": null,
+        "snippet": "#!/bin/bash"
+      },
+      "recommendation": "Add 'set -euo pipefail' to the beginning of shell scripts to ensure they fail fast on errors, unset variables, or pipeline failures, which improves reliability and debugging.",
+      "confidence": 1.0,
+      "fingerprint": "eb72f1a9c3d4e5f6"
+    }
+  ]
+}

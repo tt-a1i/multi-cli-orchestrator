@@ -1,0 +1,23 @@
+{
+  "provider": "claude",
+  "task_id": "bench-parallel2b-20260226",
+  "run_id": "claude-2302a0958d5d",
+  "pid": 18319,
+  "command": [
+    "claude",
+    "-p",
+    "--permission-mode",
+    "plan",
+    "--output-format",
+    "text",
+    "<prompt>"
+  ],
+  "started_at": "2026-02-26T06:35:52.349654+00:00",
+  "completed_at": "2026-02-26T06:36:25.320596+00:00",
+  "exit_code": 0,
+  "success": true,
+  "error_kind": null,
+  "warnings": [],
+  "stdout_path": "/Users/tsk/multi-cli-orchestrator/reports/review/bench-parallel2b-20260226/raw/claude.stdout.log",
+  "stderr_path": "/Users/tsk/multi-cli-orchestrator/reports/review/bench-parallel2b-20260226/raw/claude.stderr.log"
+}

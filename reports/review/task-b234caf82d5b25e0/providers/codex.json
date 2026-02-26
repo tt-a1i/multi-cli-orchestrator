@@ -1,0 +1,25 @@
+{
+  "provider": "codex",
+  "task_id": "task-b234caf82d5b25e0",
+  "run_id": "codex-a610745257df",
+  "pid": 5498,
+  "command": [
+    "codex",
+    "exec",
+    "--skip-git-repo-check",
+    "-C",
+    "<repo_root>",
+    "--sandbox",
+    "workspace-write",
+    "--json",
+    "<prompt>"
+  ],
+  "started_at": "2026-02-26T05:54:33.846807+00:00",
+  "completed_at": "2026-02-26T05:54:47.528839+00:00",
+  "exit_code": 0,
+  "success": true,
+  "error_kind": null,
+  "warnings": [],
+  "stdout_path": "/Users/tsk/multi-cli-orchestrator/reports/review/task-b234caf82d5b25e0/raw/codex.stdout.log",
+  "stderr_path": "/Users/tsk/multi-cli-orchestrator/reports/review/task-b234caf82d5b25e0/raw/codex.stderr.log"
+}

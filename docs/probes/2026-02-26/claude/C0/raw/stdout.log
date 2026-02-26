@@ -1,0 +1,6 @@
+{
+  "loggedIn": true,
+  "authMethod": "oauth_token",
+  "apiProvider": "firstParty",
+  "apiKeySource": "ANTHROPIC_API_KEY"
+}

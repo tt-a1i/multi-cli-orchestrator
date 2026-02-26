@@ -1,0 +1,89 @@
+{
+  "session_id": "17ab594a-398a-4d06-9c69-14ed3fe2eb7d",
+  "response": "好的，我将按要求返回指定的 JSON 对象。\n\n```json\n{\"probe\":\"dryrun-ext\",\"ok\":true}\n```",
+  "stats": {
+    "models": {
+      "gemini-2.5-flash-lite": {
+        "api": {
+          "totalRequests": 1,
+          "totalErrors": 0,
+          "totalLatencyMs": 2147
+        },
+        "tokens": {
+          "input": 3181,
+          "prompt": 3181,
+          "candidates": 27,
+          "total": 3244,
+          "cached": 0,
+          "thoughts": 36,
+          "tool": 0
+        },
+        "roles": {
+          "utility_router": {
+            "totalRequests": 1,
+            "totalErrors": 0,
+            "totalLatencyMs": 2147,
+            "tokens": {
+              "input": 3181,
+              "prompt": 3181,
+              "candidates": 27,
+              "total": 3244,
+              "cached": 0,
+              "thoughts": 36,
+              "tool": 0
+            }
+          }
+        }
+      },
+      "gemini-3-flash-preview": {
+        "api": {
+          "totalRequests": 1,
+          "totalErrors": 0,
+          "totalLatencyMs": 12120
+        },
+        "tokens": {
+          "input": 8630,
+          "prompt": 8630,
+          "candidates": 29,
+          "total": 9935,
+          "cached": 0,
+          "thoughts": 1276,
+          "tool": 0
+        },
+        "roles": {
+          "main": {
+            "totalRequests": 1,
+            "totalErrors": 0,
+            "totalLatencyMs": 12120,
+            "tokens": {
+              "input": 8630,
+              "prompt": 8630,
+              "candidates": 29,
+              "total": 9935,
+              "cached": 0,
+              "thoughts": 1276,
+              "tool": 0
+            }
+          }
+        }
+      }
+    },
+    "tools": {
+      "totalCalls": 0,
+      "totalSuccess": 0,
+      "totalFail": 0,
+      "totalDurationMs": 0,
+      "totalDecisions": {
+        "accept": 0,
+        "reject": 0,
+        "modify": 0,
+        "auto_accept": 0
+      },
+      "byName": {}
+    },
+    "files": {
+      "totalLinesAdded": 0,
+      "totalLinesRemoved": 0
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "provider": "opencode",
+  "task_id": "task-b234caf82d5b25e0",
+  "run_id": "opencode-86cf0b5f8031",
+  "pid": 5899,
+  "command": [
+    "opencode",
+    "run",
+    "<prompt>",
+    "--format",
+    "json"
+  ],
+  "started_at": "2026-02-26T05:55:26.787532+00:00",
+  "completed_at": "2026-02-26T05:55:39.466801+00:00",
+  "exit_code": 0,
+  "success": true,
+  "error_kind": null,
+  "warnings": [],
+  "stdout_path": "/Users/tsk/multi-cli-orchestrator/reports/review/task-b234caf82d5b25e0/raw/opencode.stdout.log",
+  "stderr_path": "/Users/tsk/multi-cli-orchestrator/reports/review/task-b234caf82d5b25e0/raw/opencode.stderr.log"
+}

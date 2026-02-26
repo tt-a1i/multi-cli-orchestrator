@@ -1,0 +1,27 @@
+{
+  "provider": "codex",
+  "task_id": "bench-step5-serial-20260226151851",
+  "run_id": "codex-13c5362df655",
+  "pid": 31976,
+  "command": [
+    "codex",
+    "exec",
+    "--skip-git-repo-check",
+    "-C",
+    "<repo_root>",
+    "--sandbox",
+    "workspace-write",
+    "--json",
+    "<prompt>"
+  ],
+  "started_at": "2026-02-26T07:19:29.557027+00:00",
+  "completed_at": "2026-02-26T07:20:01.279939+00:00",
+  "exit_code": 1,
+  "success": true,
+  "error_kind": null,
+  "warnings": [
+    "provider_warning_mcp_startup"
+  ],
+  "stdout_path": "/Users/tsk/multi-cli-orchestrator/reports/review/bench-step5-serial-20260226151851/raw/codex.stdout.log",
+  "stderr_path": "/Users/tsk/multi-cli-orchestrator/reports/review/bench-step5-serial-20260226151851/raw/codex.stderr.log"
+}

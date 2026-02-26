@@ -1,0 +1,31 @@
+OpenAI Codex v0.105.0 (research preview)
+--------
+workdir: /Users/tsk
+model: gpt-5.3-codex
+provider: yunyi
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR]
+reasoning effort: high
+reasoning summaries: auto
+session id: 019c9893-80dc-7df0-a38b-cfd598214732
+--------
+user
+Reply with exactly OK
+deprecated: `collab` is deprecated. Use `[features].multi_agent` instead.
+  Enable it with `--enable multi_agent` or `[features].multi_agent` in config.toml. See https://developers.openai.com/codex/config-basic#feature-flags for details.
+mcp: context7 starting
+mcp: supabase starting
+mcp: figma starting
+2026-02-26T06:12:11.640477Z ERROR rmcp::transport::async_rw: Error reading from stream: serde error EOF while parsing a value at line 1 column 0
+mcp: figma failed: MCP client for `figma` failed to start: MCP startup failed: handshaking with MCP server failed: connection closed: initialize response
+mcp: context7 ready
+2026-02-26T06:12:13.140832Z ERROR rmcp::transport::worker: worker quit with fatal: Transport channel closed, when Auth(TokenRefreshFailed("Failed to parse server response"))
+mcp: supabase failed: MCP client for `supabase` failed to start: MCP startup failed: handshaking with MCP server failed: Send message error Transport [rmcp::transport::worker::WorkerTransport<rmcp::transport::streamable_http_client::StreamableHttpClientWorker<rmcp::transport::auth::AuthClient<reqwest::async_impl::client::Client>>>] error: Auth error: OAuth token refresh failed: Failed to parse server response, when send initialize request
+mcp startup: ready: context7; failed: figma, supabase
+
+thinking
+**Confirming exact reply**
+codex
+OK
+tokens used
+8,983

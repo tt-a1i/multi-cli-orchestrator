@@ -1,0 +1,92 @@
+[
+  {
+    "task_id": "task-b234caf82d5b25e0",
+    "provider": "claude",
+    "finding_id": "MAINT-001",
+    "severity": "low",
+    "category": "maintainability",
+    "title": "Repository lacks version control initialization",
+    "evidence": {
+      "file": ".",
+      "line": null,
+      "snippet": "Is a git repository: false",
+      "symbol": null
+    },
+    "recommendation": "Initialize git repository with `git init` to enable change tracking and collaboration.",
+    "confidence": 0.95,
+    "fingerprint": "a1b2c3d4e5f6",
+    "raw_ref": "raw/claude.stdout.log"
+  },
+  {
+    "task_id": "task-b234caf82d5b25e0",
+    "provider": "codex",
+    "finding_id": "SMOKE-MAIN-001",
+    "severity": "low",
+    "category": "maintainability",
+    "title": "Large static skills list is hard to maintain",
+    "evidence": {
+      "file": "AGENTS.md",
+      "line": null,
+      "snippet": "### Available skills",
+      "symbol": null
+    },
+    "recommendation": "Split skills metadata into separate files or generate this section from a single source.",
+    "confidence": 0.86,
+    "fingerprint": "f4c68d9d7a9b7a6d8c6d8f7d5f0d4a3b",
+    "raw_ref": "raw/codex.stdout.log"
+  },
+  {
+    "task_id": "task-b234caf82d5b25e0",
+    "provider": "gemini",
+    "finding_id": "MCO-MAINT-01",
+    "severity": "low",
+    "category": "maintainability",
+    "title": "Missing module-level docstring",
+    "evidence": {
+      "file": "runtime/orchestrator.py",
+      "line": 1,
+      "snippet": "import logging",
+      "symbol": null
+    },
+    "recommendation": "Add a module docstring to document the orchestrator's purpose.",
+    "confidence": 1.0,
+    "fingerprint": "9a2b8c7d",
+    "raw_ref": "raw/gemini.stdout.log"
+  },
+  {
+    "task_id": "task-b234caf82d5b25e0",
+    "provider": "opencode",
+    "finding_id": "MTN-001",
+    "severity": "low",
+    "category": "maintainability",
+    "title": "Missing repository overview documentation",
+    "evidence": {
+      "file": "README.md",
+      "line": null,
+      "snippet": "README is absent or minimal, making project intent unclear.",
+      "symbol": null
+    },
+    "recommendation": "Add a brief README with purpose, setup, and key commands.",
+    "confidence": 0.66,
+    "fingerprint": "9e4f4c4f6b2d3a1c",
+    "raw_ref": "raw/opencode.stdout.log"
+  },
+  {
+    "task_id": "task-b234caf82d5b25e0",
+    "provider": "qwen",
+    "finding_id": "SMOKE-001",
+    "severity": "low",
+    "category": "maintainability",
+    "title": "\u9879\u76ee\u7f3a\u5c11\u6839\u76ee\u5f55 README \u6587\u6863\u7684\u4e2d\u6587\u7248\u672c",
+    "evidence": {
+      "file": "README.md",
+      "line": null,
+      "snippet": "README.md exists but no README.zh.md for Chinese localization",
+      "symbol": null
+    },
+    "recommendation": "\u8003\u8651\u6dfb\u52a0\u4e2d\u6587 README \u4ee5\u5339\u914d\u9879\u76ee\u8f93\u51fa\u8bed\u8a00\u504f\u597d",
+    "confidence": 0.3,
+    "fingerprint": "smoke-001-readme-i18n",
+    "raw_ref": "raw/qwen.stdout.log"
+  }
+]

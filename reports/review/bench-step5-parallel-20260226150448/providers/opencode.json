@@ -1,0 +1,21 @@
+{
+  "provider": "opencode",
+  "task_id": "bench-step5-parallel-20260226150448",
+  "run_id": "opencode-1ce08b702577",
+  "pid": 29151,
+  "command": [
+    "opencode",
+    "run",
+    "<prompt>",
+    "--format",
+    "json"
+  ],
+  "started_at": "2026-02-26T07:07:36.562366+00:00",
+  "completed_at": "2026-02-26T07:07:57.329470+00:00",
+  "exit_code": 0,
+  "success": true,
+  "error_kind": null,
+  "warnings": [],
+  "stdout_path": "/Users/tsk/multi-cli-orchestrator/reports/review/bench-step5-parallel-20260226150448/raw/opencode.stdout.log",
+  "stderr_path": "/Users/tsk/multi-cli-orchestrator/reports/review/bench-step5-parallel-20260226150448/raw/opencode.stderr.log"
+}

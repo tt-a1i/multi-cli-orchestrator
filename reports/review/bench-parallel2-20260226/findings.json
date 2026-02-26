@@ -1,0 +1,92 @@
+[
+  {
+    "task_id": "bench-parallel2-20260226",
+    "provider": "claude",
+    "finding_id": "MAINT-001",
+    "severity": "low",
+    "category": "maintainability",
+    "title": "Repository missing centralized configuration documentation",
+    "evidence": {
+      "file": "README.md",
+      "line": null,
+      "snippet": "N/A - smoke benchmark, no file reads performed",
+      "symbol": null
+    },
+    "recommendation": "Add a CONTRIBUTING.md or architecture doc describing project structure and configuration conventions",
+    "confidence": 0.2,
+    "fingerprint": "a1b2c3d4e5f6smoke001",
+    "raw_ref": "raw/claude.stdout.log"
+  },
+  {
+    "task_id": "bench-parallel2-20260226",
+    "provider": "codex",
+    "finding_id": "MNT-001",
+    "severity": "low",
+    "category": "maintainability",
+    "title": "Manual skill registry in AGENTS.md is hard to keep in sync",
+    "evidence": {
+      "file": "AGENTS.md",
+      "line": null,
+      "snippet": "### Available skills ... (manually enumerated list of skill names, descriptions, and file paths).",
+      "symbol": null
+    },
+    "recommendation": "Generate this section from a single machine-readable skills manifest (or enforce consistency with a CI check) so additions/removals don\u2019t require duplicated manual edits.",
+    "confidence": 0.83,
+    "fingerprint": "4d6d9ef2e3a8c1b7f0a4c9d2b5e6f813",
+    "raw_ref": "raw/codex.stdout.log"
+  },
+  {
+    "task_id": "bench-parallel2-20260226",
+    "provider": "gemini",
+    "finding_id": "MCO-MNT-01",
+    "severity": "low",
+    "category": "maintainability",
+    "title": "Shell scripts lack strict error handling flags",
+    "evidence": {
+      "file": "scripts/run_capability_probes.sh",
+      "line": 1,
+      "snippet": "#!/bin/bash",
+      "symbol": null
+    },
+    "recommendation": "Add 'set -euo pipefail' to the beginning of shell scripts to ensure they fail fast on errors, unset variables, or pipeline failures, which improves reliability and debugging.",
+    "confidence": 1.0,
+    "fingerprint": "eb72f1a9c3d4e5f6",
+    "raw_ref": "raw/gemini.stdout.log"
+  },
+  {
+    "task_id": "bench-parallel2-20260226",
+    "provider": "opencode",
+    "finding_id": "F-001",
+    "severity": "low",
+    "category": "maintainability",
+    "title": "Project root lacks explicit maintainability metadata file",
+    "evidence": {
+      "file": ".",
+      "line": null,
+      "snippet": "No dedicated maintainability conventions file (e.g., CONTRIBUTING.md or CODEOWNERS) is present at the scoped root.",
+      "symbol": null
+    },
+    "recommendation": "Add a root-level maintainability metadata file (such as CONTRIBUTING.md) defining coding conventions, review ownership, and change workflow to reduce long-term maintenance friction.",
+    "confidence": 0.51,
+    "fingerprint": "9a6fbf2dd79f4b7d0f2a2d5db5f03cc28e12f274f8d9871f3a6d66e0d4a4d3a1",
+    "raw_ref": "raw/opencode.stdout.log"
+  },
+  {
+    "task_id": "bench-parallel2-20260226",
+    "provider": "qwen",
+    "finding_id": "MAINT-001",
+    "severity": "low",
+    "category": "maintainability",
+    "title": "Missing TypeScript configuration",
+    "evidence": {
+      "file": "README.md",
+      "line": null,
+      "snippet": "Project structure lacks tsconfig.json for TypeScript type checking",
+      "symbol": null
+    },
+    "recommendation": "Add tsconfig.json to enable TypeScript compiler options and improve IDE support",
+    "confidence": 0.6,
+    "fingerprint": "maint-001-no-tsconfig",
+    "raw_ref": "raw/qwen.stdout.log"
+  }
+]

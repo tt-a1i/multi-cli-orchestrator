@@ -1,0 +1,22 @@
+{
+  "provider": "qwen",
+  "task_id": "task-b234caf82d5b25e0",
+  "run_id": "qwen-72717af5f8cc",
+  "pid": 6075,
+  "command": [
+    "qwen",
+    "<prompt>",
+    "--output-format",
+    "json",
+    "--auth-type",
+    "qwen-oauth"
+  ],
+  "started_at": "2026-02-26T05:55:48.648074+00:00",
+  "completed_at": "2026-02-26T05:56:09.948797+00:00",
+  "exit_code": 0,
+  "success": true,
+  "error_kind": null,
+  "warnings": [],
+  "stdout_path": "/Users/tsk/multi-cli-orchestrator/reports/review/task-b234caf82d5b25e0/raw/qwen.stdout.log",
+  "stderr_path": "/Users/tsk/multi-cli-orchestrator/reports/review/task-b234caf82d5b25e0/raw/qwen.stderr.log"
+}

@@ -1,0 +1,68 @@
+{
+  "task_id": "task-b234caf82d5b25e0",
+  "created_new_task": true,
+  "terminal_state": "COMPLETED",
+  "decision": "PASS",
+  "provider_results": {
+    "claude": {
+      "success": true,
+      "attempts": 1,
+      "final_error": null,
+      "deduped_dispatch": false,
+      "parse_ok": true,
+      "schema_valid_count": 1,
+      "dropped_count": 0,
+      "findings_count": 1,
+      "output_path": "/Users/tsk/multi-cli-orchestrator/reports/review/task-b234caf82d5b25e0/providers/claude.json"
+    },
+    "codex": {
+      "success": true,
+      "attempts": 1,
+      "final_error": null,
+      "deduped_dispatch": false,
+      "parse_ok": true,
+      "schema_valid_count": 1,
+      "dropped_count": 0,
+      "findings_count": 1,
+      "output_path": "/Users/tsk/multi-cli-orchestrator/reports/review/task-b234caf82d5b25e0/providers/codex.json"
+    },
+    "gemini": {
+      "success": true,
+      "attempts": 1,
+      "final_error": null,
+      "deduped_dispatch": false,
+      "parse_ok": true,
+      "schema_valid_count": 1,
+      "dropped_count": 0,
+      "findings_count": 1,
+      "output_path": "/Users/tsk/multi-cli-orchestrator/reports/review/task-b234caf82d5b25e0/providers/gemini.json"
+    },
+    "opencode": {
+      "success": true,
+      "attempts": 1,
+      "final_error": null,
+      "deduped_dispatch": false,
+      "parse_ok": true,
+      "schema_valid_count": 1,
+      "dropped_count": 0,
+      "findings_count": 1,
+      "output_path": "/Users/tsk/multi-cli-orchestrator/reports/review/task-b234caf82d5b25e0/providers/opencode.json"
+    },
+    "qwen": {
+      "success": true,
+      "attempts": 1,
+      "final_error": null,
+      "deduped_dispatch": false,
+      "parse_ok": true,
+      "schema_valid_count": 1,
+      "dropped_count": 0,
+      "findings_count": 1,
+      "output_path": "/Users/tsk/multi-cli-orchestrator/reports/review/task-b234caf82d5b25e0/providers/qwen.json"
+    }
+  },
+  "findings_count": 5,
+  "parse_success_count": 5,
+  "parse_failure_count": 0,
+  "schema_valid_count": 5,
+  "dropped_findings_count": 0
+}

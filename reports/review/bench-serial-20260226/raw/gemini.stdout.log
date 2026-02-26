@@ -1,0 +1,19 @@
+{
+  "findings": [
+    {
+      "finding_id": "MCO-MAINT-001",
+      "severity": "low",
+      "category": "maintainability",
+      "title": "Project root contains multiple loosely organized documentation files",
+      "evidence": {
+        "file": "adapter-contract-tests.md",
+        "line": null,
+        "symbol": null,
+        "snippet": "adapter-contract-tests.md"
+      },
+      "recommendation": "Consolidate root-level documentation files (e.g., adapter-contract-tests.md, capability-probe-spec.md, dry-run-plan.md) into the 'docs/' directory to maintain a clean project structure.",
+      "confidence": 1.0,
+      "fingerprint": "4928374b5c6d7e8f9a0b"
+    }
+  ]
+}

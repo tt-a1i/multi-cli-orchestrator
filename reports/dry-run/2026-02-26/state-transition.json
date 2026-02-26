@@ -1,0 +1,14 @@
+{
+  "model": "cli_only_dry_run",
+  "states": [
+    "SUBMITTED",
+    "PROVIDER_RUN_A",
+    "PROVIDER_RUN_B",
+    "ARTIFACTS_WRITTEN"
+  ],
+  "limitations": [
+    "No orchestrator queue",
+    "No dispatch key enforcement",
+    "No provider attempt state machine"
+  ]
+}

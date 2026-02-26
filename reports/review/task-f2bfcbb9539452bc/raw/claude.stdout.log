@@ -1,0 +1,9 @@
+10 findings across security, bug, and maintainability categories. Key highlights:
+
+- **MCO-001** (medium/security): `_resolve_binary` interpolates into `bash -lc` — shell injection pattern even though `binary_name` is currently hardcoded
+- **MCO-002** (medium/security): User-supplied `--task-id` flows unsanitized into `Path(base_dir) / task_id` — path traversal
+- **MCO-003** (medium/bug): `_load_state` crashes on corrupted JSON with no error handling
+- **MCO-004/005** (medium/bug): `cancel()` catches only `ProcessLookupError`; file handles leak if `poll()` is never called
+- **MCO-006** (medium/maintainability): Bare `except Exception: continue` silently swallows normalization errors
+
+Note: The initial exploration flagged command injection via `input_task.prompt` in `Popen`, but I verified this is **not** exploitable — `Popen` receives a list without `shell=True`, so each element is a separate argv entry, not shell-interpreted.

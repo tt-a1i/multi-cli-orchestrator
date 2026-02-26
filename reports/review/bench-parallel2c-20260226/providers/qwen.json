@@ -1,0 +1,22 @@
+{
+  "provider": "qwen",
+  "task_id": "bench-parallel2c-20260226",
+  "run_id": "qwen-0ece621921a4",
+  "pid": 21570,
+  "command": [
+    "qwen",
+    "<prompt>",
+    "--output-format",
+    "json",
+    "--auth-type",
+    "qwen-oauth"
+  ],
+  "started_at": "2026-02-26T06:50:35.829222+00:00",
+  "completed_at": "2026-02-26T06:50:45.446269+00:00",
+  "exit_code": 0,
+  "success": true,
+  "error_kind": null,
+  "warnings": [],
+  "stdout_path": "/Users/tsk/multi-cli-orchestrator/reports/review/bench-parallel2c-20260226/raw/qwen.stdout.log",
+  "stderr_path": "/Users/tsk/multi-cli-orchestrator/reports/review/bench-parallel2c-20260226/raw/qwen.stderr.log"
+}

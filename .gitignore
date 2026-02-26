@@ -1,0 +1,14 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Local runtime state
+.mco/state.json
+
+# Temp artifacts
+*.tmp

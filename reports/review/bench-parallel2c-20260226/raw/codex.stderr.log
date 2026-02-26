@@ -1,0 +1,1 @@
+2026-02-26T06:48:43.161812Z ERROR rmcp::transport::worker: worker quit with fatal: Transport channel closed, when Auth(TokenRefreshFailed("Failed to parse server response"))

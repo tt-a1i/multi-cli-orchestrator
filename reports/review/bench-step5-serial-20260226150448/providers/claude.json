@@ -1,0 +1,23 @@
+{
+  "provider": "claude",
+  "task_id": "bench-step5-serial-20260226150448",
+  "run_id": "claude-2b93ef57c400",
+  "pid": 27900,
+  "command": [
+    "claude",
+    "-p",
+    "--permission-mode",
+    "plan",
+    "--output-format",
+    "text",
+    "<prompt>"
+  ],
+  "started_at": "2026-02-26T07:04:49.463086+00:00",
+  "completed_at": "2026-02-26T07:05:39.408620+00:00",
+  "exit_code": 0,
+  "success": true,
+  "error_kind": null,
+  "warnings": [],
+  "stdout_path": "/Users/tsk/multi-cli-orchestrator/reports/review/bench-step5-serial-20260226150448/raw/claude.stdout.log",
+  "stderr_path": "/Users/tsk/multi-cli-orchestrator/reports/review/bench-step5-serial-20260226150448/raw/claude.stderr.log"
+}

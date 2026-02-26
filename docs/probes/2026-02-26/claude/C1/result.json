@@ -1,0 +1,14 @@
+{
+  "provider": "claude",
+  "provider_version": "2.1.59",
+  "os": "macos",
+  "capability": "C1",
+  "status": "PASS",
+  "reason": "probe_passed",
+  "artifacts": {
+    "stdout_path": "/Users/tsk/multi-cli-orchestrator/docs/probes/2026-02-26/claude/C1/raw/stdout.log",
+    "stderr_path": "/Users/tsk/multi-cli-orchestrator/docs/probes/2026-02-26/claude/C1/raw/stderr.log",
+    "parsed_output_path": "/Users/tsk/multi-cli-orchestrator/docs/probes/2026-02-26/claude/C1/parsed.json"
+  },
+  "timestamp": "2026-02-26T06:12:09Z"
+}

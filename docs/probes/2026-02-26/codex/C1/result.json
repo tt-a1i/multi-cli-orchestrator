@@ -1,0 +1,14 @@
+{
+  "provider": "codex",
+  "provider_version": "0.105.0",
+  "os": "macos",
+  "capability": "C1",
+  "status": "PASS",
+  "reason": "probe_passed",
+  "artifacts": {
+    "stdout_path": "/Users/tsk/multi-cli-orchestrator/docs/probes/2026-02-26/codex/C1/raw/stdout.log",
+    "stderr_path": "/Users/tsk/multi-cli-orchestrator/docs/probes/2026-02-26/codex/C1/raw/stderr.log",
+    "parsed_output_path": "/Users/tsk/multi-cli-orchestrator/docs/probes/2026-02-26/codex/C1/parsed.json"
+  },
+  "timestamp": "2026-02-26T06:12:17Z"
+}

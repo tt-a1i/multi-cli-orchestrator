@@ -1,0 +1,2 @@
+2026-02-26T06:34:09.547084Z ERROR rmcp::transport::async_rw: Error reading from stream: serde error EOF while parsing a value at line 1 column 0
+2026-02-26T06:34:10.691606Z ERROR rmcp::transport::worker: worker quit with fatal: Transport channel closed, when Auth(TokenRefreshFailed("Failed to parse server response"))

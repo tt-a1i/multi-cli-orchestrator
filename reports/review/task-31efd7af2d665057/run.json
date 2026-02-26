@@ -1,0 +1,20 @@
+{
+  "task_id": "task-31efd7af2d665057",
+  "created_new_task": true,
+  "terminal_state": "COMPLETED",
+  "decision": "PASS",
+  "provider_results": {
+    "claude": {
+      "success": true,
+      "attempts": 1,
+      "final_error": null,
+      "deduped_dispatch": false,
+      "parse_ok": true,
+      "findings_count": 1,
+      "output_path": "/Users/tsk/multi-cli-orchestrator/reports/review/task-31efd7af2d665057/providers/claude.json"
+    }
+  },
+  "findings_count": 1,
+  "parse_success_count": 1,
+  "parse_failure_count": 0
+}

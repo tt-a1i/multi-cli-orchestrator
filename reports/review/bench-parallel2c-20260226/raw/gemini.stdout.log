@@ -1,0 +1,23 @@
+我在 `runtime/adapters/parsing.py` 中发现了一个低风险的可维护性问题：
+
+```json
+{
+  "findings": [
+    {
+      "finding_id": "MCO-MAINT-001",
+      "severity": "low",
+      "category": "maintainability",
+      "title": "Missing Docstrings in Parsing Logic",
+      "evidence": {
+        "file": "runtime/adapters/parsing.py",
+        "line": 12,
+        "symbol": "parse_candidate",
+        "snippet": "def parse_candidate(raw_output: str) -> dict:"
+      },
+      "recommendation": "Add a comprehensive docstring to the parse_candidate function to document expected input formats and potential parsing exceptions, improving long-term maintainability.",
+      "confidence": 0.95,
+      "fingerprint": "a7b8c9d0e1f2"
+    }
+  ]
+}
+```

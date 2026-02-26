@@ -1,0 +1,17 @@
+{
+  "providers": ["claude", "codex"],
+  "artifact_base": "reports/review",
+  "state_file": ".mco/state.json",
+  "policy": {
+    "timeout_seconds": 180,
+    "max_retries": 1,
+    "high_escalation_threshold": 1,
+    "require_non_empty_findings": true,
+    "max_provider_parallelism": 0,
+    "provider_timeouts": {
+      "claude": 300,
+      "codex": 240,
+      "qwen": 240
+    }
+  }
+}

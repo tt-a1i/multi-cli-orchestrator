@@ -1,0 +1,92 @@
+[
+  {
+    "task_id": "bench-parallel2b-20260226",
+    "provider": "claude",
+    "finding_id": "MAINT-001",
+    "severity": "low",
+    "category": "maintainability",
+    "title": "Repository lacks git version control initialization",
+    "evidence": {
+      "file": ".",
+      "line": null,
+      "snippet": "Is a git repository: false",
+      "symbol": null
+    },
+    "recommendation": "Initialize git with `git init` and create an initial commit to enable change tracking, branching, and collaboration workflows.",
+    "confidence": 0.95,
+    "fingerprint": "a1b2c3d4e5f6-no-git-init",
+    "raw_ref": "raw/claude.stdout.log"
+  },
+  {
+    "task_id": "bench-parallel2b-20260226",
+    "provider": "codex",
+    "finding_id": "maint-agentsmd-skill-registry-sprawl",
+    "severity": "low",
+    "category": "maintainability",
+    "title": "AGENTS.md contains a large hard-coded skill registry",
+    "evidence": {
+      "file": "AGENTS.md",
+      "line": null,
+      "snippet": "### Available skills\n- OSS Contributor: ...\n- ...\n- skill-installer: ...",
+      "symbol": null
+    },
+    "recommendation": "Move the skill list to a generated manifest (or separate include file) and keep AGENTS.md focused on policy/instructions to reduce manual update burden and drift risk.",
+    "confidence": 0.9,
+    "fingerprint": "7d7d4e2d1fbb3a4cb0f9b16a58f6d6d8093677e7af4f33ab8f8f0b7f6e3b5a2c",
+    "raw_ref": "raw/codex.stdout.log"
+  },
+  {
+    "task_id": "bench-parallel2b-20260226",
+    "provider": "gemini",
+    "finding_id": "MCO-MAINT-ROOT-DOCS",
+    "severity": "low",
+    "category": "maintainability",
+    "title": "High density of documentation in root directory",
+    "evidence": {
+      "file": "capability-probe-spec.md",
+      "line": null,
+      "snippet": "capability-probe-spec.md",
+      "symbol": null
+    },
+    "recommendation": "Move design and research markdown files from the project root into the 'docs/' directory to improve project organization and declutter the workspace.",
+    "confidence": 0.95,
+    "fingerprint": "a9b8c7d6e5f4g3h2",
+    "raw_ref": "raw/gemini.stdout.log"
+  },
+  {
+    "task_id": "bench-parallel2b-20260226",
+    "provider": "opencode",
+    "finding_id": "MNT-001",
+    "severity": "low",
+    "category": "maintainability",
+    "title": "Hardcoded default language rule may reduce portability",
+    "evidence": {
+      "file": "AGENTS.md",
+      "line": null,
+      "snippet": "- Default output language: Chinese (Simplified)\uff0c\u5728\u89c4\u5212\u6587\u6863\u4e2d\u548c\u6240\u6709\u8f93\u51fa\u4e2d\u90fd\u5c3d\u91cf\u4f7f\u7528\u4e2d\u6587.",
+      "symbol": null
+    },
+    "recommendation": "Move language preference into a configurable setting (for example, environment variable or per-project config) and document an override mechanism to improve reuse across different teams and repositories.",
+    "confidence": 0.78,
+    "fingerprint": "c3efec3c7a7fb837df9f4cf9ea5d2999b6e744b3",
+    "raw_ref": "raw/opencode.stdout.log"
+  },
+  {
+    "task_id": "bench-parallel2b-20260226",
+    "provider": "qwen",
+    "finding_id": "MAINT-001",
+    "severity": "low",
+    "category": "maintainability",
+    "title": "Missing documentation for runtime directory",
+    "evidence": {
+      "file": "runtime/",
+      "line": null,
+      "snippet": "runtime/ directory exists but lacks README or documentation",
+      "symbol": null
+    },
+    "recommendation": "Add a README.md to document the purpose and contents of the runtime directory",
+    "confidence": 0.7,
+    "fingerprint": "maint-001-runtime-docs",
+    "raw_ref": "raw/qwen.stdout.log"
+  }
+]

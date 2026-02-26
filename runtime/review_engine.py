@@ -1,0 +1,476 @@
+from __future__ import annotations
+
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import hashlib
+import json
+import time
+from dataclasses import asdict, dataclass
+from pathlib import Path
+from typing import Dict, List, Mapping, Optional
+
+from .adapters import ClaudeAdapter, CodexAdapter, GeminiAdapter, OpenCodeAdapter, QwenAdapter
+from .adapters.parsing import inspect_contract_output
+from .artifacts import expected_paths, task_artifact_root
+from .config import ReviewPolicy
+from .contracts import Evidence, NormalizeContext, NormalizedFinding, ProviderAdapter, ProviderId, TaskInput
+from .orchestrator import OrchestratorRuntime
+from .retry import RetryPolicy
+from .types import AttemptResult, ErrorKind, TaskState
+
+
+STRICT_JSON_CONTRACT = (
+    "Return JSON only. Use this exact shape: "
+    '{"findings":[{"finding_id":"<id>","severity":"critical|high|medium|low","category":"bug|security|performance|maintainability|test-gap","title":"<title>",'
+    '"evidence":{"file":"<path>","line":null,"symbol":null,"snippet":"<snippet>"},'
+    '"recommendation":"<fix>","confidence":0.0,"fingerprint":"<stable-hash>"}]}. '
+    "If no findings, return {\"findings\":[]}."
+)
+
+
+@dataclass(frozen=True)
+class ReviewRequest:
+    repo_root: str
+    prompt: str
+    providers: List[ProviderId]
+    artifact_base: str
+    state_file: str
+    policy: ReviewPolicy
+    task_id: Optional[str] = None
+    idempotency_key: Optional[str] = None
+    target_paths: Optional[List[str]] = None
+
+
+@dataclass(frozen=True)
+class ReviewResult:
+    task_id: str
+    artifact_root: str
+    decision: str
+    terminal_state: str
+    provider_results: Dict[str, Dict[str, object]]
+    findings_count: int
+    parse_success_count: int
+    parse_failure_count: int
+    schema_valid_count: int
+    dropped_findings_count: int
+    created_new_task: bool
+
+
+def _sha(value: str) -> str:
+    return hashlib.sha256(value.encode("utf-8")).hexdigest()
+
+
+def _default_task_id(repo_root: str, prompt: str) -> str:
+    return f"task-{_sha(f'{repo_root}:{prompt}')[:16]}"
+
+
+def _default_idempotency_key(repo_root: str, prompt: str, providers: List[ProviderId]) -> str:
+    return _sha(f"{repo_root}|{prompt}|{','.join(providers)}|stage-a-v1")
+
+
+def _build_prompt(user_prompt: str, target_paths: List[str]) -> str:
+    scope = ", ".join(target_paths) if target_paths else "."
+    return f"{user_prompt}\n\nScope: {scope}\n\n{STRICT_JSON_CONTRACT}"
+
+
+def _adapter_registry() -> Mapping[str, ProviderAdapter]:
+    return {
+        "claude": ClaudeAdapter(),
+        "codex": CodexAdapter(),
+        "gemini": GeminiAdapter(),
+        "opencode": OpenCodeAdapter(),
+        "qwen": QwenAdapter(),
+    }
+
+
+def _read_text(path: Path) -> str:
+    return path.read_text(encoding="utf-8") if path.exists() else ""
+
+
+def _write_json(path: Path, payload: object) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, ensure_ascii=True, indent=2), encoding="utf-8")
+
+
+def _write_text(path: Path, content: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(content, encoding="utf-8")
+
+
+@dataclass(frozen=True)
+class _ProviderExecutionOutcome:
+    provider: str
+    success: bool
+    parse_ok: bool
+    schema_valid_count: int
+    dropped_count: int
+    findings: List[NormalizedFinding]
+    provider_result: Dict[str, object]
+
+
+def _provider_timeout_seconds(policy: ReviewPolicy, provider: str) -> int:
+    timeout = policy.provider_timeouts.get(provider, policy.timeout_seconds)
+    try:
+        value = int(timeout)
+    except Exception:
+        value = policy.timeout_seconds
+    return value if value > 0 else policy.timeout_seconds
+
+
+def _ensure_provider_artifacts(artifact_base: str, task_id: str, provider: str) -> None:
+    paths = expected_paths(artifact_base, task_id, (provider,))
+    provider_json = paths[f"providers/{provider}.json"]
+    if not provider_json.exists():
+        _write_json(provider_json, {"provider": provider, "note": "provider result fallback"})
+    for key in (f"raw/{provider}.stdout.log", f"raw/{provider}.stderr.log"):
+        p = paths[key]
+        if not p.exists():
+            _write_text(p, "")
+
+
+def _deserialize_findings(payload: object) -> List[NormalizedFinding]:
+    findings: List[NormalizedFinding] = []
+    findings_payload = payload if isinstance(payload, list) else []
+    serialized_findings = [item for item in findings_payload if isinstance(item, dict)]
+    for item in serialized_findings:
+        try:
+            evidence_raw = item.get("evidence", {})
+            if not isinstance(evidence_raw, dict):
+                continue
+            evidence = Evidence(
+                file=str(evidence_raw.get("file", "")),
+                line=evidence_raw.get("line") if isinstance(evidence_raw.get("line"), int) else None,
+                snippet=str(evidence_raw.get("snippet", "")),
+                symbol=evidence_raw.get("symbol") if isinstance(evidence_raw.get("symbol"), str) else None,
+            )
+            finding = NormalizedFinding(
+                task_id=str(item["task_id"]),
+                provider=item["provider"],
+                finding_id=str(item["finding_id"]),
+                severity=item["severity"],
+                category=item["category"],
+                title=str(item["title"]),
+                evidence=evidence,
+                recommendation=str(item.get("recommendation", "")),
+                confidence=float(item.get("confidence", 0.0)),
+                fingerprint=str(item.get("fingerprint", "")),
+                raw_ref=str(item.get("raw_ref", "")),
+            )
+        except Exception:
+            continue
+        findings.append(finding)
+    return findings
+
+
+def _run_provider(
+    request: ReviewRequest,
+    runtime: OrchestratorRuntime,
+    adapter_map: Mapping[str, ProviderAdapter],
+    resolved_task_id: str,
+    full_prompt: str,
+    target_paths: List[str],
+    provider: str,
+) -> _ProviderExecutionOutcome:
+    adapter = adapter_map.get(provider)
+    if adapter is None:
+        _ensure_provider_artifacts(request.artifact_base, resolved_task_id, provider)
+        return _ProviderExecutionOutcome(
+            provider=provider,
+            success=False,
+            parse_ok=False,
+            schema_valid_count=0,
+            dropped_count=0,
+            findings=[],
+            provider_result={"success": False, "reason": "adapter_not_implemented"},
+        )
+
+    presence = adapter.detect()
+    if not presence.detected or not presence.auth_ok:
+        _ensure_provider_artifacts(request.artifact_base, resolved_task_id, provider)
+        return _ProviderExecutionOutcome(
+            provider=provider,
+            success=False,
+            parse_ok=False,
+            schema_valid_count=0,
+            dropped_count=0,
+            findings=[],
+            provider_result={
+                "success": False,
+                "reason": "provider_unavailable",
+                "detected": presence.detected,
+                "auth_ok": presence.auth_ok,
+            },
+        )
+
+    dispatch_key = _sha(f"{resolved_task_id}:{provider}:dispatch-v1")
+    provider_timeout = _provider_timeout_seconds(request.policy, provider)
+
+    def runner(_attempt: int) -> AttemptResult:
+        run_ref = None
+        try:
+            input_task = TaskInput(
+                task_id=resolved_task_id,
+                prompt=full_prompt,
+                repo_root=request.repo_root,
+                target_paths=target_paths,
+                timeout_seconds=provider_timeout,
+                metadata={"artifact_root": request.artifact_base},
+            )
+            run_ref = adapter.run(input_task)
+            started = time.time()
+            status = None
+            while time.time() - started < provider_timeout:
+                status = adapter.poll(run_ref)
+                if status.completed:
+                    break
+                time.sleep(0.25)
+
+            if status is None or not status.completed:
+                if run_ref is not None:
+                    try:
+                        adapter.cancel(run_ref)
+                    except Exception:
+                        pass
+                return AttemptResult(success=False, error_kind=ErrorKind.RETRYABLE_TIMEOUT, stderr="provider_poll_timeout")
+
+            raw_stdout = _read_text(Path(run_ref.artifact_path) / "raw" / f"{provider}.stdout.log")
+            findings = adapter.normalize(
+                raw_stdout,
+                NormalizeContext(task_id=resolved_task_id, provider=provider, repo_root=request.repo_root, raw_ref=f"raw/{provider}.stdout.log"),
+            )
+            contract_info = inspect_contract_output(raw_stdout)
+
+            parse_ok = bool(contract_info["parse_ok"])
+            success = status.attempt_state == "SUCCEEDED" and parse_ok
+            if request.policy.require_non_empty_findings and success and len(findings) == 0:
+                success = False
+
+            payload = {
+                "provider": provider,
+                "status": asdict(status),
+                "run_ref": asdict(run_ref),
+                "parse_ok": parse_ok,
+                "parse_reason": str(contract_info.get("parse_reason", "")),
+                "schema_valid_count": int(contract_info["schema_valid_count"]),
+                "dropped_count": int(contract_info["dropped_count"]),
+                "findings": [asdict(item) for item in findings],
+            }
+            if success:
+                return AttemptResult(success=True, output=payload)
+            if status.error_kind:
+                return AttemptResult(success=False, output=payload, error_kind=status.error_kind)
+            return AttemptResult(success=False, output=payload, error_kind=ErrorKind.NORMALIZATION_ERROR)
+        except Exception as exc:  # pragma: no cover - guarded by contract tests
+            return AttemptResult(success=False, error_kind=ErrorKind.NORMALIZATION_ERROR, stderr=str(exc))
+
+    run_result = runtime.run_with_retry(resolved_task_id, provider, dispatch_key, runner)
+    output = run_result.output if isinstance(run_result.output, dict) else {}
+    parse_ok = bool(output.get("parse_ok", False))
+    provider_schema_valid = int(output.get("schema_valid_count", 0))
+    provider_dropped = int(output.get("dropped_count", 0))
+    findings = _deserialize_findings(output.get("findings"))
+
+    provider_result = {
+        "success": run_result.success,
+        "attempts": run_result.attempts,
+        "final_error": run_result.final_error.value if run_result.final_error else None,
+        "deduped_dispatch": run_result.deduped_dispatch,
+        "parse_ok": parse_ok,
+        "parse_reason": str(output.get("parse_reason", "")),
+        "schema_valid_count": provider_schema_valid,
+        "dropped_count": provider_dropped,
+        "findings_count": len(findings),
+        "output_path": output.get("status", {}).get("output_path") if isinstance(output.get("status"), dict) else None,
+    }
+    _ensure_provider_artifacts(request.artifact_base, resolved_task_id, provider)
+    return _ProviderExecutionOutcome(
+        provider=provider,
+        success=run_result.success,
+        parse_ok=parse_ok,
+        schema_valid_count=provider_schema_valid,
+        dropped_count=provider_dropped,
+        findings=findings,
+        provider_result=provider_result,
+    )
+
+
+def run_review(request: ReviewRequest, adapters: Optional[Mapping[str, ProviderAdapter]] = None) -> ReviewResult:
+    adapter_map = dict(adapters or _adapter_registry())
+    task_id = request.task_id or _default_task_id(request.repo_root, request.prompt)
+    idempotency_key = request.idempotency_key or _default_idempotency_key(request.repo_root, request.prompt, request.providers)
+
+    runtime = OrchestratorRuntime(
+        retry_policy=RetryPolicy(max_retries=request.policy.max_retries, base_delay_seconds=1.0, backoff_multiplier=2.0),
+        state_file=request.state_file,
+    )
+    created_new_task, resolved_task_id = runtime.submit(task_id, idempotency_key)
+    artifact_root = str(task_artifact_root(request.artifact_base, resolved_task_id))
+    root_path = Path(artifact_root)
+    root_path.mkdir(parents=True, exist_ok=True)
+
+    if not created_new_task:
+        run_file = root_path / "run.json"
+        if run_file.exists():
+            existing = json.loads(run_file.read_text(encoding="utf-8"))
+            return ReviewResult(
+                task_id=resolved_task_id,
+                artifact_root=artifact_root,
+                decision=str(existing.get("decision", "INCONCLUSIVE")),
+                terminal_state=str(existing.get("terminal_state", TaskState.FAILED.value)),
+                provider_results=dict(existing.get("provider_results", {})),
+                findings_count=int(existing.get("findings_count", 0)),
+                parse_success_count=int(existing.get("parse_success_count", 0)),
+                parse_failure_count=int(existing.get("parse_failure_count", 0)),
+                schema_valid_count=int(existing.get("schema_valid_count", 0)),
+                dropped_findings_count=int(existing.get("dropped_findings_count", 0)),
+                created_new_task=False,
+            )
+
+    target_paths = request.target_paths or ["."]
+    full_prompt = _build_prompt(request.prompt, target_paths)
+    provider_order: List[str] = []
+    provider_seen = set()
+    for provider in request.providers:
+        if provider in provider_seen:
+            continue
+        provider_seen.add(provider)
+        provider_order.append(provider)
+    provider_order = sorted(provider_order)
+
+    if request.policy.max_provider_parallelism <= 0:
+        max_workers = max(1, len(provider_order))
+    else:
+        max_workers = max(1, min(len(provider_order), request.policy.max_provider_parallelism))
+    outcomes: Dict[str, _ProviderExecutionOutcome] = {}
+    if max_workers <= 1:
+        for provider in provider_order:
+            outcomes[provider] = _run_provider(request, runtime, adapter_map, resolved_task_id, full_prompt, target_paths, provider)
+    else:
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            futures = {
+                executor.submit(
+                    _run_provider,
+                    request,
+                    runtime,
+                    adapter_map,
+                    resolved_task_id,
+                    full_prompt,
+                    target_paths,
+                    provider,
+                ): provider
+                for provider in provider_order
+            }
+            for future in as_completed(futures):
+                provider = futures[future]
+                try:
+                    outcomes[provider] = future.result()
+                except Exception as exc:  # pragma: no cover - protective guard
+                    _ensure_provider_artifacts(request.artifact_base, resolved_task_id, provider)
+                    outcomes[provider] = _ProviderExecutionOutcome(
+                        provider=provider,
+                        success=False,
+                        parse_ok=False,
+                        schema_valid_count=0,
+                        dropped_count=0,
+                        findings=[],
+                        provider_result={"success": False, "reason": "internal_error", "error": str(exc)},
+                    )
+
+    provider_results: Dict[str, Dict[str, object]] = {}
+    required_provider_success: Dict[str, bool] = {}
+    aggregated_findings: List[NormalizedFinding] = []
+    parse_success_count = 0
+    parse_failure_count = 0
+    schema_valid_count = 0
+    dropped_findings_count = 0
+
+    for provider in provider_order:
+        outcome = outcomes[provider]
+        provider_results[provider] = outcome.provider_result
+        required_provider_success[provider] = outcome.success
+        aggregated_findings.extend(outcome.findings)
+        if outcome.parse_ok:
+            parse_success_count += 1
+        else:
+            parse_failure_count += 1
+        schema_valid_count += outcome.schema_valid_count
+        dropped_findings_count += outcome.dropped_count
+
+    terminal_state = runtime.evaluate_terminal_state(required_provider_success)
+    aggregated_findings.sort(key=lambda item: (item.provider, item.finding_id, item.fingerprint))
+
+    counts = {"critical": 0, "high": 0, "medium": 0, "low": 0}
+    for finding in aggregated_findings:
+        counts[finding.severity] = counts.get(finding.severity, 0) + 1
+
+    if counts.get("critical", 0) > 0:
+        decision = "FAIL"
+    elif counts.get("high", 0) >= request.policy.high_escalation_threshold:
+        decision = "ESCALATE"
+    elif len(aggregated_findings) == 0:
+        decision = "INCONCLUSIVE"
+    else:
+        decision = "PASS"
+
+    findings_json = [
+        asdict(item)
+        for item in aggregated_findings
+    ]
+
+    _write_json(root_path / "findings.json", findings_json)
+
+    summary = [
+        f"# Review Summary ({resolved_task_id})",
+        "",
+        f"- Decision: {decision}",
+        f"- Terminal state: {terminal_state.value}",
+        f"- Providers: {', '.join(provider_order)}",
+        f"- Findings total: {len(aggregated_findings)}",
+        f"- Parse success count: {parse_success_count}",
+        f"- Parse failure count: {parse_failure_count}",
+        f"- Schema valid finding count: {schema_valid_count}",
+        f"- Dropped finding count: {dropped_findings_count}",
+        "",
+        "## Severity Counts",
+        f"- critical: {counts['critical']}",
+        f"- high: {counts['high']}",
+        f"- medium: {counts['medium']}",
+        f"- low: {counts['low']}",
+    ]
+    _write_text(root_path / "summary.md", "\n".join(summary))
+
+    decision_lines = [
+        f"# Review Decision ({resolved_task_id})",
+        "",
+        f"- decision: {decision}",
+        f"- terminal_state: {terminal_state.value}",
+        f"- rule_trace: critical={counts['critical']}, high={counts['high']}, findings={len(aggregated_findings)}",
+    ]
+    _write_text(root_path / "decision.md", "\n".join(decision_lines))
+
+    run_payload = {
+        "task_id": resolved_task_id,
+        "created_new_task": created_new_task,
+        "terminal_state": terminal_state.value,
+        "decision": decision,
+        "provider_results": provider_results,
+        "findings_count": len(aggregated_findings),
+        "parse_success_count": parse_success_count,
+        "parse_failure_count": parse_failure_count,
+        "schema_valid_count": schema_valid_count,
+        "dropped_findings_count": dropped_findings_count,
+    }
+    _write_json(root_path / "run.json", run_payload)
+
+    return ReviewResult(
+        task_id=resolved_task_id,
+        artifact_root=artifact_root,
+        decision=decision,
+        terminal_state=terminal_state.value,
+        provider_results=provider_results,
+        findings_count=len(aggregated_findings),
+        parse_success_count=parse_success_count,
+        parse_failure_count=parse_failure_count,
+        schema_valid_count=schema_valid_count,
+        dropped_findings_count=dropped_findings_count,
+        created_new_task=created_new_task,
+    )

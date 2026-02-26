@@ -1,0 +1,1 @@
+{"findings":[{"finding_id":"MCO-MAINT-01","severity":"low","category":"maintainability","title":"Missing module-level docstring","evidence":{"file":"runtime/orchestrator.py","line":1,"symbol":null,"snippet":"import logging"},"recommendation":"Add a module docstring to document the orchestrator's purpose.","confidence":1.0,"fingerprint":"9a2b8c7d"}]}

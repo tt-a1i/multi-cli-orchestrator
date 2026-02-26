@@ -1,0 +1,92 @@
+[
+  {
+    "task_id": "bench-serial-20260226",
+    "provider": "claude",
+    "finding_id": "MAINT-001",
+    "severity": "low",
+    "category": "maintainability",
+    "title": "Repository missing standardized CLAUDE.md project instructions",
+    "evidence": {
+      "file": "CLAUDE.md",
+      "line": null,
+      "snippet": "(file not found)",
+      "symbol": null
+    },
+    "recommendation": "Add a project-level CLAUDE.md with build commands, test instructions, and architecture notes to improve onboarding and AI-assisted development consistency.",
+    "confidence": 0.6,
+    "fingerprint": "a1b2c3d4e5f6",
+    "raw_ref": "raw/claude.stdout.log"
+  },
+  {
+    "task_id": "bench-serial-20260226",
+    "provider": "codex",
+    "finding_id": "maint-001",
+    "severity": "low",
+    "category": "maintainability",
+    "title": "AGENTS.md centralizes a long manually curated skill registry",
+    "evidence": {
+      "file": "AGENTS.md",
+      "line": null,
+      "snippet": "### Available skills ... - OSS Contributor ... - web-interface-guidelines ... - skill-installer",
+      "symbol": null
+    },
+    "recommendation": "Split the skill registry into smaller include files (or generate it from a source directory) to reduce manual editing overhead and drift risk.",
+    "confidence": 0.93,
+    "fingerprint": "0c5a9f4f9f3c1f2f5e9f5ac75c45c0f6c7c8e8ef7f6d0b3fb52e9f4e5d7b1a2c",
+    "raw_ref": "raw/codex.stdout.log"
+  },
+  {
+    "task_id": "bench-serial-20260226",
+    "provider": "gemini",
+    "finding_id": "MCO-MAINT-001",
+    "severity": "low",
+    "category": "maintainability",
+    "title": "Project root contains multiple loosely organized documentation files",
+    "evidence": {
+      "file": "adapter-contract-tests.md",
+      "line": null,
+      "snippet": "adapter-contract-tests.md",
+      "symbol": null
+    },
+    "recommendation": "Consolidate root-level documentation files (e.g., adapter-contract-tests.md, capability-probe-spec.md, dry-run-plan.md) into the 'docs/' directory to maintain a clean project structure.",
+    "confidence": 1.0,
+    "fingerprint": "4928374b5c6d7e8f9a0b",
+    "raw_ref": "raw/gemini.stdout.log"
+  },
+  {
+    "task_id": "bench-serial-20260226",
+    "provider": "opencode",
+    "finding_id": "MB-001",
+    "severity": "low",
+    "category": "maintainability",
+    "title": "\u9879\u76ee\u6839\u76ee\u5f55\u7f3a\u5c11README\u6587\u6863\uff0c\u964d\u4f4e\u53ef\u7ef4\u62a4\u6027",
+    "evidence": {
+      "file": "README.md",
+      "line": null,
+      "snippet": "README.md not found in project root",
+      "symbol": null
+    },
+    "recommendation": "\u5728\u9879\u76ee\u6839\u76ee\u5f55\u65b0\u589eREADME.md\uff0c\u81f3\u5c11\u5305\u542b\u9879\u76ee\u7b80\u4ecb\u3001\u76ee\u5f55\u7ed3\u6784\u3001\u5b89\u88c5\u6b65\u9aa4\u3001\u8fd0\u884c\u65b9\u5f0f\u4e0e\u5e38\u89c1\u5f00\u53d1\u547d\u4ee4\uff0c\u4ee5\u964d\u4f4e\u65b0\u6210\u5458\u4e0a\u624b\u6210\u672c\u5e76\u63d0\u5347\u957f\u671f\u53ef\u7ef4\u62a4\u6027\u3002",
+    "confidence": 0.84,
+    "fingerprint": "d9f2a3e6c6d14b6f9a2b1d5c3e7f8a10",
+    "raw_ref": "raw/opencode.stdout.log"
+  },
+  {
+    "task_id": "bench-serial-20260226",
+    "provider": "qwen",
+    "finding_id": "MAINT-001",
+    "severity": "low",
+    "category": "maintainability",
+    "title": "\u7f3a\u5c11\u9879\u76ee\u7ea7\u6587\u6863\u7d22\u5f15",
+    "evidence": {
+      "file": "README.md",
+      "line": null,
+      "snippet": "README.md \u672a\u5305\u542b\u5b8c\u6574\u7684\u9879\u76ee\u7ed3\u6784\u5bfc\u822a\u548c\u6a21\u5757\u5173\u7cfb\u8bf4\u660e",
+      "symbol": null
+    },
+    "recommendation": "\u5728 README.md \u4e2d\u6dfb\u52a0\u9879\u76ee\u76ee\u5f55\u7ed3\u6784\u6982\u89c8\u548c\u5404\u6a21\u5757\u804c\u8d23\u8bf4\u660e",
+    "confidence": 0.85,
+    "fingerprint": "maint-doc-index-001",
+    "raw_ref": "raw/qwen.stdout.log"
+  }
+]

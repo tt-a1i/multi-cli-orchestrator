@@ -1,0 +1,31 @@
+{
+  "idempotency_key": "0da56e98207704b3bb740eca6225000d7f7d09cc2747bedb6e539f475d8af9bd",
+  "duplicate_submission_simulated": true,
+  "parse_checks": {
+    "claude": true,
+    "codex": true,
+    "gemini": true,
+    "opencode": true,
+    "qwen": true
+  },
+  "output_hashes": {
+    "claude_run_a": "5333ee4d8ac5f04d9741bfa06ede585cc927ad33213d482b94368d11f2e883c4",
+    "claude_run_b": "5d6d5f4f0cd17abbcf9bd0c2513c6c71384da5b3af0618a61a09bc555701fa05",
+    "codex_run_a": "fb9d8be60c3d6503b1e2448ccfb07b4d94d46e727cf9628074af155be70cb66f",
+    "codex_run_b": "fb9d8be60c3d6503b1e2448ccfb07b4d94d46e727cf9628074af155be70cb66f",
+    "gemini_run_a": "0bfb96f3a63b05dc86416a4a696b7ec7abc410d54b5c4a15f96161a32d00eed1",
+    "gemini_run_b": "6f50d766db82a22462ac99cd5a3278b220f3e54dffb1b1610e8003743c1c8e66",
+    "opencode_run_a": "812156335e8c511834ce83f55eb756c617509915d55402af1146b9d22adddf97",
+    "opencode_run_b": "5eeacc1a5f33d8eddec55b958ea4cc6094663e87184dfb4b66105ad10e7a0e27",
+    "qwen_run_a": "4fe944878fd040cfc9ee529a937a89775624905ce2cec62c584d5ab65d1c9909",
+    "qwen_run_b": "87083dc16e33d4b39e90c392b2963a38956dff22e6db0e250666670e2f9c742e"
+  },
+  "dedupe_observation": {
+    "claude_identical": false,
+    "codex_identical": true,
+    "gemini_identical": false,
+    "opencode_identical": false,
+    "qwen_identical": false
+  },
+  "note": "LLM output hash drift is expected; idempotency is enforced by runtime dispatch/notification keys, validated in G/H tests."
+}

@@ -1,0 +1,56 @@
+[
+  {
+    "task_id": "bench-parallel2c-20260226",
+    "provider": "gemini",
+    "finding_id": "MCO-MAINT-001",
+    "severity": "low",
+    "category": "maintainability",
+    "title": "Missing Docstrings in Parsing Logic",
+    "evidence": {
+      "file": "runtime/adapters/parsing.py",
+      "line": 12,
+      "snippet": "def parse_candidate(raw_output: str) -> dict:",
+      "symbol": "parse_candidate"
+    },
+    "recommendation": "Add a comprehensive docstring to the parse_candidate function to document expected input formats and potential parsing exceptions, improving long-term maintainability.",
+    "confidence": 0.95,
+    "fingerprint": "a7b8c9d0e1f2",
+    "raw_ref": "raw/gemini.stdout.log"
+  },
+  {
+    "task_id": "bench-parallel2c-20260226",
+    "provider": "opencode",
+    "finding_id": "MB-001",
+    "severity": "low",
+    "category": "maintainability",
+    "title": "Parse candidate fallback logic is duplicated and hard to evolve",
+    "evidence": {
+      "file": "src/parse-candidate.ts",
+      "line": null,
+      "snippet": "if (!candidate) { candidate = fallbackCandidate(input) }\n...\nif (!candidate) { candidate = fallbackCandidate(input) }",
+      "symbol": null
+    },
+    "recommendation": "Extract fallback resolution into a single helper (e.g., resolveCandidateWithFallback) and call it once to reduce duplication and future drift during parser updates.",
+    "confidence": 0.25,
+    "fingerprint": "b6b5f0f2f4cc30e8d8ac8a7d2b3f3b8e9f3f25f0f6f4d5d3f3659f2cb1f1df11",
+    "raw_ref": "raw/opencode.stdout.log"
+  },
+  {
+    "task_id": "bench-parallel2c-20260226",
+    "provider": "qwen",
+    "finding_id": "SMOKE-001",
+    "severity": "low",
+    "category": "maintainability",
+    "title": "Benchmark smoke test lacks parse-candidate validation coverage",
+    "evidence": {
+      "file": "tests/",
+      "line": null,
+      "snippet": "No tools available for parse-candidate smoke benchmark validation",
+      "symbol": null
+    },
+    "recommendation": "Add smoke benchmark test case for parse-candidate function with representative CLI output samples",
+    "confidence": 0.85,
+    "fingerprint": "smoke-parse-candidate-coverage-gap",
+    "raw_ref": "raw/qwen.stdout.log"
+  }
+]

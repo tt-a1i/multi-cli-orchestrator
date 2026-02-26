@@ -1,0 +1,60 @@
+name: Gate
+
+on:
+  pull_request:
+  push:
+  workflow_dispatch:
+    inputs:
+      run_capability_probes:
+        description: "Run capability probes (requires self-hosted macOS runner with configured CLIs)"
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  runtime-gate:
+    name: Runtime G/H gate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install test dependencies
+        run: sudo apt-get update && sudo apt-get install -y jq ripgrep
+
+      - name: Run runtime gate tests
+        run: ./scripts/run_runtime_gate_tests.sh
+
+      - name: Upload runtime gate artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: runtime-gate-${{ github.run_id }}
+          path: reports/adapter-contract/**
+          if-no-files-found: ignore
+
+  capability-probes:
+    name: Capability probes (manual)
+    if: github.event_name == 'workflow_dispatch' && inputs.run_capability_probes == true
+    runs-on:
+      - self-hosted
+      - macOS
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run capability probes
+        run: ./scripts/run_capability_probes.sh
+
+      - name: Upload capability probe artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: capability-probes-${{ github.run_id }}
+          path: docs/probes/**
+          if-no-files-found: ignore

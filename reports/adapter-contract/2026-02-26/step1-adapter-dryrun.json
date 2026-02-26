@@ -1,0 +1,26 @@
+[
+  {
+    "provider": "claude",
+    "task_id": "step1-claude-1772082236",
+    "run_id": "claude-a7b1083dcecf",
+    "attempt_state": "SUCCEEDED",
+    "completed": true,
+    "error_kind": null,
+    "exit_code": 0,
+    "normalized_findings": 0,
+    "artifact_path": "/Users/tsk/multi-cli-orchestrator/reports/adapter-contract/2026-02-26/step1-adapter-dryrun-artifacts/step1-claude-1772082236",
+    "provider_output": "/Users/tsk/multi-cli-orchestrator/reports/adapter-contract/2026-02-26/step1-adapter-dryrun-artifacts/step1-claude-1772082236/providers/claude.json"
+  },
+  {
+    "provider": "codex",
+    "task_id": "step1-codex-1772082254",
+    "run_id": "codex-c65dc2316b7e",
+    "attempt_state": "SUCCEEDED",
+    "completed": true,
+    "error_kind": null,
+    "exit_code": 1,
+    "normalized_findings": 0,
+    "artifact_path": "/Users/tsk/multi-cli-orchestrator/reports/adapter-contract/2026-02-26/step1-adapter-dryrun-artifacts/step1-codex-1772082254",
+    "provider_output": "/Users/tsk/multi-cli-orchestrator/reports/adapter-contract/2026-02-26/step1-adapter-dryrun-artifacts/step1-codex-1772082254/providers/codex.json"
+  }
+]

@@ -1,0 +1,13 @@
+2026-02-26T07:21:11.406439Z ERROR rmcp::transport::worker: worker quit with fatal: Transport channel closed, when AuthRequired(AuthRequiredError { www_authenticate_header: "Bearer error=\"invalid_request\", error_description=\"Invalid oauth access token\", resource_metadata=\"https://mcp.supabase.com/.well-known/oauth-protected-resource/mcp\"" })
+2026-02-26T07:21:14.255019Z ERROR codex_mcp_client::mcp_client: failed to deserialize JSONRPCMessage: EOF while parsing a value at line 1 column 0; line = 
+2026-02-26T07:21:14.255125Z ERROR codex_mcp_client::mcp_client: failed to deserialize JSONRPCMessage: expected value at line 1 column 1; line = Configuration:
+2026-02-26T07:21:14.255275Z ERROR codex_mcp_client::mcp_client: failed to deserialize JSONRPCMessage: invalid number at line 1 column 2; line = - ENV_FILE: /Users/tsk/multi-cli-orchestrator/.env (source: default)
+2026-02-26T07:21:14.255324Z ERROR codex_mcp_client::mcp_client: failed to deserialize JSONRPCMessage: invalid number at line 1 column 2; line = - FIGMA_API_KEY: ****tRXx (source: env)
+2026-02-26T07:21:14.255342Z ERROR codex_mcp_client::mcp_client: failed to deserialize JSONRPCMessage: invalid number at line 1 column 2; line = - Authentication Method: Personal Access Token (X-Figma-Token)
+2026-02-26T07:21:14.255360Z ERROR codex_mcp_client::mcp_client: failed to deserialize JSONRPCMessage: invalid number at line 1 column 2; line = - PORT: 3333 (source: default)
+2026-02-26T07:21:14.255370Z ERROR codex_mcp_client::mcp_client: failed to deserialize JSONRPCMessage: invalid number at line 1 column 2; line = - OUTPUT_FORMAT: yaml (source: default)
+2026-02-26T07:21:14.255381Z ERROR codex_mcp_client::mcp_client: failed to deserialize JSONRPCMessage: invalid number at line 1 column 2; line = - SKIP_IMAGE_DOWNLOADS: false (source: default)
+2026-02-26T07:21:14.255587Z ERROR codex_mcp_client::mcp_client: failed to deserialize JSONRPCMessage: EOF while parsing a value at line 1 column 0; line = 
+2026-02-26T07:21:14.262237Z ERROR codex_mcp_client::mcp_client: failed to deserialize JSONRPCMessage: expected value at line 1 column 1; line = Initializing Figma MCP Server in HTTP mode on port 3333...
+2026-02-26T07:21:19.775975Z ERROR codex_core::codex: MCP client for `supabase` failed to start: handshaking with MCP server failed: Send message error Transport [rmcp::transport::worker::WorkerTransport<rmcp::transport::streamable_http_client::StreamableHttpClientWorker<rmcp::transport::auth::AuthClient<reqwest::async_impl::client::Client>>>] error: Auth required, when send initialize request
+2026-02-26T07:21:19.776310Z ERROR codex_core::codex: MCP client for `figma` failed to start: request timed out
