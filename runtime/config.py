@@ -15,6 +15,7 @@ class ReviewPolicy:
     stall_timeout_seconds: int = 900
     poll_interval_seconds: float = 1.0
     review_hard_timeout_seconds: int = 1800
+    enforce_findings_contract: bool = False
     max_retries: int = 1
     high_escalation_threshold: int = 1
     require_non_empty_findings: bool = True
@@ -125,6 +126,7 @@ def _to_policy(payload: Dict[str, Any]) -> ReviewPolicy:
         stall_timeout_seconds=stall_timeout_seconds,
         poll_interval_seconds=poll_interval_seconds,
         review_hard_timeout_seconds=review_hard_timeout_seconds,
+        enforce_findings_contract=_as_bool(payload.get("enforce_findings_contract", False), False),
         max_retries=int(payload.get("max_retries", 1)),
         high_escalation_threshold=int(payload.get("high_escalation_threshold", 1)),
         require_non_empty_findings=_as_bool(payload.get("require_non_empty_findings", True), True),

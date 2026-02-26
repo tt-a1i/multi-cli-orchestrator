@@ -20,15 +20,42 @@
 1. [task_plan.md](./task_plan.md)
 
 ## Release Notes
-1. [docs/releases/v0.1.1.md](./docs/releases/v0.1.1.md)
-2. [docs/releases/v0.1.1.zh-CN.md](./docs/releases/v0.1.1.zh-CN.md)
-3. [docs/releases/v0.1.0.md](./docs/releases/v0.1.0.md)
-4. [docs/releases/v0.1.0.zh-CN.md](./docs/releases/v0.1.0.zh-CN.md)
+1. [docs/releases/v0.1.2.md](./docs/releases/v0.1.2.md)
+2. [docs/releases/v0.1.2.zh-CN.md](./docs/releases/v0.1.2.zh-CN.md)
+3. [docs/releases/v0.1.1.md](./docs/releases/v0.1.1.md)
+4. [docs/releases/v0.1.1.zh-CN.md](./docs/releases/v0.1.1.zh-CN.md)
+5. [docs/releases/v0.1.0.md](./docs/releases/v0.1.0.md)
+6. [docs/releases/v0.1.0.zh-CN.md](./docs/releases/v0.1.0.zh-CN.md)
 
 ## Unified CLI (Step 2)
 `mco review` is the unified entrypoint for running a review task.
 
 `mco run` is the generalized execution entrypoint for agent-style task orchestration (no forced findings schema).
+
+## Installation
+
+Python package (recommended):
+
+```bash
+pipx install multi-cli-orchestrator
+mco --help
+```
+
+Install from source (editable):
+
+```bash
+git clone https://github.com/tsk/multi-cli-orchestrator.git
+cd multi-cli-orchestrator
+python3 -m pip install -e .
+mco --help
+```
+
+NPM wrapper (Python 3 required on PATH):
+
+```bash
+npm i -g @multi-cli-orchestrator/cli
+mco --help
+```
 
 Quick start:
 ```bash
@@ -41,6 +68,11 @@ Quick start:
 Machine-readable output:
 ```bash
 ./mco review --repo . --prompt "Review for bugs." --providers claude,codex --json
+```
+
+Stdout-only result mode (for caller rendering, no `summary.md/decision.md/findings.json/run.json` write):
+```bash
+./mco review --repo . --prompt "Review for bugs." --providers claude,codex --result-mode stdout --json
 ```
 
 General run mode:
@@ -59,6 +91,7 @@ Config file (JSON):
     "stall_timeout_seconds": 900,
     "poll_interval_seconds": 1.0,
     "review_hard_timeout_seconds": 1800,
+    "enforce_findings_contract": false,
     "max_retries": 1,
     "high_escalation_threshold": 1,
     "require_non_empty_findings": true,
@@ -93,6 +126,7 @@ Override fan-out and per-provider timeout from CLI:
   --repo . \
   --prompt "Review for bugs and security issues." \
   --providers claude,codex,gemini,opencode,qwen \
+  --strict-contract \
   --max-provider-parallelism 2 \
   --stall-timeout 900 \
   --review-hard-timeout 1800 \
@@ -127,8 +161,12 @@ Artifacts are written to:
 
 Notes:
 - YAML config requires `pyyaml` installed; otherwise use JSON config.
-- Review prompt is wrapped with a strict JSON finding contract by default.
+- Review prompt is wrapped with a JSON finding contract, but strict parse enforcement is optional.
+- Enable strict gate behavior with `--strict-contract` (or `policy.enforce_findings_contract=true` in config).
 - `run` mode does not force findings schema; it focuses on execution aggregation and provider success.
+- `result_mode=artifact` (default): write user-facing artifacts and print compact result.
+- `result_mode=stdout`: print provider-level result payload to stdout, skip user-facing artifact files.
+- `result_mode=both`: write artifacts and print provider-level payload.
 - Execution model is `wait-all`: one provider timeout/failure does not stop others.
 - Timeout behavior is progress-driven:
   - `stall_timeout_seconds`: cancel only when output progress is idle beyond threshold.

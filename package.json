@@ -1,0 +1,22 @@
+{
+  "name": "@multi-cli-orchestrator/cli",
+  "version": "0.1.2",
+  "description": "Node wrapper for the mco CLI (Python runtime required).",
+  "license": "UNLICENSED",
+  "bin": {
+    "mco": "bin/mco.js"
+  },
+  "type": "commonjs",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node -e \"console.log('No JS tests. Use Python test suite.')\""
+  },
+  "files": [
+    "bin/mco.js",
+    "mco",
+    "runtime"
+  ]
+}
+

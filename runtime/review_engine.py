@@ -126,6 +126,14 @@ def _write_text(path: Path, content: str) -> None:
     path.write_text(content, encoding="utf-8")
 
 
+def _output_excerpt(stdout_text: str, stderr_text: str, limit: int = 240) -> str:
+    source = stdout_text.strip() or stderr_text.strip()
+    if not source:
+        return ""
+    compact = " ".join(source.split())
+    return compact[:limit]
+
+
 @dataclass(frozen=True)
 class _ProviderExecutionOutcome:
     provider: str
@@ -392,10 +400,14 @@ def _run_provider(
                             adapter.cancel(run_ref)
                         except Exception:
                             pass
+                    raw_dir = Path(run_ref.artifact_path) / "raw"
+                    timeout_stdout = _read_text(raw_dir / f"{provider}.stdout.log")
+                    timeout_stderr = _read_text(raw_dir / f"{provider}.stderr.log")
                     timeout_payload = {
                         "cancel_reason": cancel_reason,
                         "wall_clock_seconds": round(now - started, 3),
                         "last_progress_at": _timestamp_to_iso(last_progress_at),
+                        "output_excerpt": _output_excerpt(timeout_stdout, timeout_stderr),
                         "parse_ok": False,
                         "parse_reason": "",
                         "schema_valid_count": 0,
@@ -423,6 +435,7 @@ def _run_provider(
                     "cancel_reason": "provider_poll_timeout",
                     "wall_clock_seconds": round(time.time() - started, 3),
                     "last_progress_at": _timestamp_to_iso(last_progress_at),
+                    "output_excerpt": "",
                     "parse_ok": False,
                     "parse_reason": "",
                     "schema_valid_count": 0,
@@ -438,7 +451,9 @@ def _run_provider(
                     stderr="provider_poll_timeout",
                 )
 
-            raw_stdout = _read_text(Path(run_ref.artifact_path) / "raw" / f"{provider}.stdout.log")
+            raw_dir = Path(run_ref.artifact_path) / "raw"
+            raw_stdout = _read_text(raw_dir / f"{provider}.stdout.log")
+            raw_stderr = _read_text(raw_dir / f"{provider}.stderr.log")
             findings: List[NormalizedFinding] = []
             parse_ok = False
             parse_reason = "not_applicable"
@@ -460,9 +475,10 @@ def _run_provider(
                 parse_reason = str(contract_info.get("parse_reason", ""))
                 schema_valid_count = int(contract_info["schema_valid_count"])
                 dropped_count = int(contract_info["dropped_count"])
-                success = status.attempt_state == "SUCCEEDED" and parse_ok
-                if request.policy.require_non_empty_findings and success and len(findings) == 0:
-                    success = False
+                if request.policy.enforce_findings_contract:
+                    success = status.attempt_state == "SUCCEEDED" and parse_ok
+                    if request.policy.require_non_empty_findings and success and len(findings) == 0:
+                        success = False
 
             payload = {
                 "provider": provider,
@@ -471,6 +487,7 @@ def _run_provider(
                 "cancel_reason": "",
                 "wall_clock_seconds": round(time.time() - started, 3),
                 "last_progress_at": _timestamp_to_iso(last_progress_at),
+                "output_excerpt": _output_excerpt(raw_stdout, raw_stderr),
                 "parse_ok": parse_ok,
                 "parse_reason": parse_reason,
                 "schema_valid_count": schema_valid_count,
@@ -506,6 +523,7 @@ def _run_provider(
         "cancel_reason": str(output.get("cancel_reason", "")),
         "wall_clock_seconds": wall_clock_seconds,
         "last_progress_at": str(output.get("last_progress_at", "")),
+        "output_excerpt": str(output.get("output_excerpt", "")),
         "parse_ok": parse_ok,
         "parse_reason": str(output.get("parse_reason", "")),
         "schema_valid_count": provider_schema_valid,
@@ -533,6 +551,7 @@ def run_review(
     request: ReviewRequest,
     adapters: Optional[Mapping[str, ProviderAdapter]] = None,
     review_mode: bool = True,
+    write_artifacts: bool = True,
 ) -> ReviewResult:
     adapter_map = dict(adapters or _adapter_registry())
     task_id = request.task_id or _default_task_id(request.repo_root, request.prompt)
@@ -675,8 +694,12 @@ def run_review(
         decision = "FAIL"
     elif review_mode and counts.get("high", 0) >= request.policy.high_escalation_threshold:
         decision = "ESCALATE"
-    elif review_mode and len(aggregated_findings) == 0:
+    elif review_mode and request.policy.enforce_findings_contract and len(aggregated_findings) == 0:
         decision = "INCONCLUSIVE"
+    elif review_mode and terminal_state == TaskState.FAILED:
+        decision = "FAIL"
+    elif review_mode and terminal_state == TaskState.PARTIAL_SUCCESS:
+        decision = "PARTIAL"
     elif not review_mode and terminal_state == TaskState.FAILED:
         decision = "FAIL"
     elif not review_mode and terminal_state == TaskState.PARTIAL_SUCCESS:
@@ -689,7 +712,7 @@ def run_review(
         for item in aggregated_findings
     ]
 
-    if review_mode:
+    if review_mode and write_artifacts:
         _write_json(root_path / "findings.json", findings_json)
 
     summary = [
@@ -705,14 +728,29 @@ def run_review(
         f"- Dropped finding count: {dropped_findings_count}",
         f"- Allow paths: {', '.join(normalized_allow_paths)}",
         f"- Enforcement mode: {request.policy.enforcement_mode}",
+        f"- Strict contract: {request.policy.enforce_findings_contract}",
         "",
         "## Severity Counts",
         f"- critical: {counts['critical']}",
         f"- high: {counts['high']}",
         f"- medium: {counts['medium']}",
         f"- low: {counts['low']}",
+        "",
+        "## Provider Results",
     ]
-    _write_text(root_path / "summary.md", "\n".join(summary))
+    for provider in provider_order:
+        details = provider_results.get(provider, {})
+        success = bool(details.get("success"))
+        parse_reason = str(details.get("parse_reason", ""))
+        cancel_reason = str(details.get("cancel_reason", ""))
+        excerpt = str(details.get("output_excerpt", ""))
+        summary.append(
+            f"- {provider}: success={success}, final_error={details.get('final_error')}, parse_reason={parse_reason or '-'}, cancel_reason={cancel_reason or '-'}"
+        )
+        if excerpt:
+            summary.append(f"  excerpt: {excerpt}")
+    if write_artifacts:
+        _write_text(root_path / "summary.md", "\n".join(summary))
 
     decision_lines = [f"# {'Review' if review_mode else 'Run'} Decision ({resolved_task_id})", ""]
     decision_lines.append(f"- decision: {decision}")
@@ -726,7 +764,8 @@ def run_review(
         decision_lines.append(
             f"- run_trace: providers={len(required_provider_success)}, success={success_count}, failed={len(required_provider_success) - success_count}"
         )
-    _write_text(root_path / "decision.md", "\n".join(decision_lines))
+    if write_artifacts:
+        _write_text(root_path / "decision.md", "\n".join(decision_lines))
 
     run_payload = {
         "task_id": resolved_task_id,
@@ -739,6 +778,7 @@ def run_review(
         "allow_paths_hash": _stable_payload_hash(normalized_allow_paths),
         "target_paths": normalized_targets,
         "enforcement_mode": request.policy.enforcement_mode,
+        "enforce_findings_contract": request.policy.enforce_findings_contract,
         "provider_permissions": request.policy.provider_permissions,
         "permissions_hash": _stable_payload_hash(request.policy.provider_permissions),
         "provider_results": provider_results,
@@ -748,7 +788,8 @@ def run_review(
         "schema_valid_count": schema_valid_count,
         "dropped_findings_count": dropped_findings_count,
     }
-    _write_json(root_path / "run.json", run_payload)
+    if write_artifacts:
+        _write_json(root_path / "run.json", run_payload)
 
     return ReviewResult(
         task_id=resolved_task_id,

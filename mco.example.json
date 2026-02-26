@@ -7,6 +7,7 @@
     "stall_timeout_seconds": 900,
     "poll_interval_seconds": 1.0,
     "review_hard_timeout_seconds": 1800,
+    "enforce_findings_contract": false,
     "max_retries": 1,
     "high_escalation_threshold": 1,
     "require_non_empty_findings": true,

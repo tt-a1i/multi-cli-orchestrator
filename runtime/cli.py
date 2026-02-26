@@ -10,6 +10,53 @@ from .config import ReviewConfig, ReviewPolicy, load_review_config
 from .review_engine import ReviewRequest, run_review
 
 
+def _render_user_readable_report(
+    command: str,
+    result_mode: str,
+    providers: List[str],
+    payload: Dict[str, object],
+    provider_results: Dict[str, Dict[str, object]],
+) -> str:
+    lines: List[str] = []
+    title = "Review" if command == "review" else "Run"
+    lines.append(f"{title} Result")
+    lines.append("")
+    lines.append("Execution Summary")
+    lines.append(f"- task_id: {payload['task_id']}")
+    lines.append(f"- decision: {payload['decision']}")
+    lines.append(f"- terminal_state: {payload['terminal_state']}")
+    lines.append(f"- providers: {', '.join(providers)}")
+    lines.append(
+        f"- provider_success/failure: {payload['provider_success_count']}/{payload['provider_failure_count']}"
+    )
+    lines.append(f"- findings_count: {payload['findings_count']}")
+    lines.append(f"- parse_success/failure: {payload['parse_success_count']}/{payload['parse_failure_count']}")
+    lines.append(f"- schema_valid_count: {payload['schema_valid_count']}")
+    lines.append("")
+    lines.append("Provider Details")
+    for provider in sorted(provider_results.keys()):
+        details = provider_results.get(provider, {})
+        success = bool(details.get("success"))
+        attempts = details.get("attempts")
+        final_error = details.get("final_error")
+        parse_reason = details.get("parse_reason")
+        findings_count = details.get("findings_count")
+        lines.append(
+            f"- {provider}: success={success}, attempts={attempts}, final_error={final_error}, parse_reason={parse_reason}, findings={findings_count}"
+        )
+        excerpt = str(details.get("output_excerpt", "")).strip()
+        if excerpt:
+            lines.append(f"  excerpt: {excerpt}")
+    lines.append("")
+    if result_mode in ("artifact", "both"):
+        lines.append("Artifacts")
+        lines.append(f"- artifact_root: {payload['artifact_root']}")
+    else:
+        lines.append("Artifacts")
+        lines.append("- artifact files are skipped in stdout mode")
+    return "\n".join(lines)
+
+
 def _parse_providers(raw: str) -> List[str]:
     seen = set()
     providers: List[str] = []
@@ -110,6 +157,11 @@ def _add_common_execution_args(parser: argparse.ArgumentParser) -> None:
         help="Provider permission mapping as JSON, e.g. '{\"codex\":{\"sandbox\":\"workspace-write\"}}'",
     )
     parser.add_argument(
+        "--strict-contract",
+        action="store_true",
+        help="Enforce strict findings JSON contract in review mode",
+    )
+    parser.add_argument(
         "--max-provider-parallelism",
         type=int,
         default=None,
@@ -137,6 +189,12 @@ def _add_common_execution_args(parser: argparse.ArgumentParser) -> None:
         type=int,
         default=None,
         help="Override review-mode hard deadline seconds (0 disables hard deadline)",
+    )
+    parser.add_argument(
+        "--result-mode",
+        choices=("artifact", "stdout", "both"),
+        default="artifact",
+        help="Result delivery mode: artifact files, stdout payload, or both",
     )
     parser.add_argument("--json", action="store_true", help="Print machine-readable result JSON")
 
@@ -178,12 +236,14 @@ def _resolve_config(args: argparse.Namespace) -> ReviewConfig:
     review_hard_timeout_seconds = cfg.policy.review_hard_timeout_seconds
     if args.review_hard_timeout is not None and args.review_hard_timeout >= 0:
         review_hard_timeout_seconds = args.review_hard_timeout
+    enforce_findings_contract = cfg.policy.enforce_findings_contract or bool(args.strict_contract)
 
     policy = ReviewPolicy(
         timeout_seconds=cfg.policy.timeout_seconds,
         stall_timeout_seconds=stall_timeout_seconds,
         poll_interval_seconds=poll_interval_seconds,
         review_hard_timeout_seconds=review_hard_timeout_seconds,
+        enforce_findings_contract=enforce_findings_contract,
         max_retries=cfg.policy.max_retries,
         high_escalation_threshold=cfg.policy.high_escalation_threshold,
         require_non_empty_findings=cfg.policy.require_non_empty_findings,
@@ -222,7 +282,8 @@ def main(argv: List[str] | None = None) -> int:
         target_paths=[item.strip() for item in args.target_paths.split(",") if item.strip()],
     )
     review_mode = args.command == "review"
-    result = run_review(req, review_mode=review_mode)
+    write_artifacts = args.result_mode in ("artifact", "both")
+    result = run_review(req, review_mode=review_mode, write_artifacts=write_artifacts)
 
     payload = {
         "command": args.command,
@@ -239,17 +300,35 @@ def main(argv: List[str] | None = None) -> int:
         "dropped_findings_count": result.dropped_findings_count,
         "created_new_task": result.created_new_task,
     }
-    if args.json:
-        print(json.dumps(payload, ensure_ascii=True))
+    if args.result_mode == "artifact":
+        if args.json:
+            print(json.dumps(payload, ensure_ascii=True))
+        else:
+            print(
+                _render_user_readable_report(
+                    args.command,
+                    args.result_mode,
+                    providers,
+                    payload,
+                    result.provider_results,
+                )
+            )
     else:
-        print(f"task_id={result.task_id}")
-        print(f"decision={result.decision}")
-        print(f"artifact_root={result.artifact_root}")
-        print(f"findings={result.findings_count}")
-        print(f"parse_success={result.parse_success_count}")
-        print(f"parse_failure={result.parse_failure_count}")
-        print(f"schema_valid={result.schema_valid_count}")
-        print(f"dropped_findings={result.dropped_findings_count}")
+        detailed_payload = dict(payload)
+        detailed_payload["result_mode"] = args.result_mode
+        detailed_payload["provider_results"] = result.provider_results
+        if args.json:
+            print(json.dumps(detailed_payload, ensure_ascii=True))
+        else:
+            print(
+                _render_user_readable_report(
+                    args.command,
+                    args.result_mode,
+                    providers,
+                    payload,
+                    result.provider_results,
+                )
+            )
 
     if result.decision == "FAIL":
         return 2

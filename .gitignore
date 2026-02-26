@@ -6,9 +6,18 @@ __pycache__/
 *.py[cod]
 *.pyo
 *.pyd
+build/
+dist/
+*.egg-info/
+.venv-build/
 
 # Local runtime state
 .mco/state.json
 
 # Temp artifacts
 *.tmp
+
+# Local review runs
+reports/review/task-*/
+reports/review/bench-step*/
+reports/review/run-best-effort-*/

@@ -81,6 +81,7 @@ class CliTests(unittest.TestCase):
                     "best_effort",
                     "--provider-permissions-json",
                     '{"claude":{"permission_mode":"accept-edits"}}',
+                    "--strict-contract",
                 ]
             )
             resolved = _resolve_config(args)
@@ -98,6 +99,7 @@ class CliTests(unittest.TestCase):
                 resolved.policy.provider_permissions.get("claude"),
                 {"permission_mode": "accept-edits"},
             )
+            self.assertTrue(resolved.policy.enforce_findings_contract)
 
     def test_resolve_config_allows_cli_zero_to_force_full_parallel(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -130,6 +132,7 @@ class CliTests(unittest.TestCase):
         parser = build_parser()
         args = parser.parse_args(["run", "--prompt", "x"])
         self.assertEqual(args.command, "run")
+        self.assertEqual(args.result_mode, "artifact")
 
 
 if __name__ == "__main__":
