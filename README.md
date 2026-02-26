@@ -32,6 +32,28 @@ MCO is designed to be called by an orchestrating agent — from Claude Code, Cur
 
 The adapter architecture is extensible — adding a new agent CLI requires implementing three hooks: auth check, command builder, and output normalizer.
 
+## Why Multi-Agent?
+
+No single AI model sees everything. Each model has its own training data, reasoning style, and blind spots. When you run a code review with only one agent, you get one perspective — and whatever it misses, you miss.
+
+**Code review** is where this matters most. In practice:
+
+- One agent catches a race condition in your async code but overlooks an SQL injection in the ORM layer.
+- Another spots the injection immediately but misses the race condition entirely.
+- A third flags neither of those but finds a subtle memory leak in the resource cleanup path that the other two ignored.
+
+These aren't hypothetical — different models genuinely have different strengths. Some are better at security analysis, some at logic flow, some at performance patterns. By running 3-5 agents in parallel on the same codebase, you get a **union of perspectives** rather than the intersection. The result is a more thorough review than any single agent could produce, regardless of which one you pick.
+
+MCO makes this practical: one command, all agents run simultaneously, and results are aggregated into a single findings report. The overhead is near zero — the wall-clock time is roughly equal to the slowest agent, not the sum of all agents.
+
+This principle extends beyond code review:
+
+- **Architecture analysis** — different agents surface different design risks and trade-offs
+- **Bug hunting** — broader coverage across code paths and edge cases
+- **Refactoring assessment** — multiple perspectives on impact and safety of proposed changes
+
+The question isn't "which AI agent is best" — it's "why limit yourself to one?"
+
 ## Quick Start
 
 Install via npm (Python 3 required on PATH):
