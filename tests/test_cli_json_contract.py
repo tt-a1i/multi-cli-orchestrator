@@ -88,7 +88,77 @@ class CliJsonContractTests(unittest.TestCase):
             self.assertEqual(payload["parse_success_count"], 0)
             self.assertEqual(payload["parse_failure_count"], 0)
 
+    def test_stdout_mode_json_includes_provider_results(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            result = ReviewResult(
+                task_id="task-run-stdout-1",
+                artifact_root=f"{tmpdir}/reports/review/task-run-stdout-1",
+                decision="PASS",
+                terminal_state="COMPLETED",
+                provider_results={"codex": {"success": True, "output_excerpt": "ok"}},
+                findings_count=0,
+                parse_success_count=0,
+                parse_failure_count=0,
+                schema_valid_count=0,
+                dropped_findings_count=0,
+                created_new_task=True,
+            )
+            exit_code, payload = self._invoke_json(
+                [
+                    "run",
+                    "--repo",
+                    tmpdir,
+                    "--prompt",
+                    "run",
+                    "--providers",
+                    "codex",
+                    "--result-mode",
+                    "stdout",
+                    "--json",
+                ],
+                result,
+            )
+            self.assertEqual(exit_code, 0)
+            self.assertEqual(payload["command"], "run")
+            self.assertEqual(payload["result_mode"], "stdout")
+            self.assertIn("provider_results", payload)
+            self.assertIn("codex", payload["provider_results"])
+
+    def test_stdout_mode_calls_engine_without_artifact_writes(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            result = ReviewResult(
+                task_id="task-run-stdout-2",
+                artifact_root=f"{tmpdir}/reports/review/task-run-stdout-2",
+                decision="PASS",
+                terminal_state="COMPLETED",
+                provider_results={"codex": {"success": True}},
+                findings_count=0,
+                parse_success_count=0,
+                parse_failure_count=0,
+                schema_valid_count=0,
+                dropped_findings_count=0,
+                created_new_task=True,
+            )
+            with patch("runtime.cli.run_review", return_value=result) as mocked:
+                output = io.StringIO()
+                with redirect_stdout(output):
+                    exit_code = main(
+                        [
+                            "run",
+                            "--repo",
+                            tmpdir,
+                            "--prompt",
+                            "run",
+                            "--providers",
+                            "codex",
+                            "--result-mode",
+                            "stdout",
+                            "--json",
+                        ]
+                    )
+            self.assertEqual(exit_code, 0)
+            self.assertEqual(mocked.call_args.kwargs.get("write_artifacts"), False)
+
 
 if __name__ == "__main__":
     unittest.main()
-

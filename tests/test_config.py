@@ -17,6 +17,7 @@ class ConfigTests(unittest.TestCase):
         self.assertEqual(cfg.policy.stall_timeout_seconds, 900)
         self.assertEqual(cfg.policy.poll_interval_seconds, 1.0)
         self.assertEqual(cfg.policy.review_hard_timeout_seconds, 1800)
+        self.assertFalse(cfg.policy.enforce_findings_contract)
         self.assertEqual(cfg.policy.allow_paths, ["."])
         self.assertEqual(cfg.policy.provider_permissions, {})
         self.assertEqual(cfg.policy.enforcement_mode, "strict")
@@ -35,6 +36,7 @@ class ConfigTests(unittest.TestCase):
                             "stall_timeout_seconds": 321,
                             "poll_interval_seconds": 2.5,
                             "review_hard_timeout_seconds": 2222,
+                            "enforce_findings_contract": True,
                             "require_non_empty_findings": False,
                             "max_provider_parallelism": 3,
                             "provider_timeouts": {"claude": 120},
@@ -53,6 +55,7 @@ class ConfigTests(unittest.TestCase):
             self.assertEqual(cfg.policy.stall_timeout_seconds, 321)
             self.assertEqual(cfg.policy.poll_interval_seconds, 2.5)
             self.assertEqual(cfg.policy.review_hard_timeout_seconds, 2222)
+            self.assertTrue(cfg.policy.enforce_findings_contract)
             self.assertFalse(cfg.policy.require_non_empty_findings)
             self.assertEqual(cfg.policy.max_provider_parallelism, 3)
             self.assertEqual(cfg.policy.provider_timeouts.get("claude"), 120)

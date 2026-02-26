@@ -173,7 +173,7 @@ class ReviewEngineTests(unittest.TestCase):
             self.assertEqual(result.findings_count, 1)
             self.assertEqual(result.parse_success_count, 1)
 
-    def test_review_no_findings_is_inconclusive(self) -> None:
+    def test_review_no_findings_is_inconclusive_in_strict_mode(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             adapter = FakeAdapter("claude", '{"findings":[]}')
             req = ReviewRequest(
@@ -182,14 +182,19 @@ class ReviewEngineTests(unittest.TestCase):
                 providers=["claude"],  # type: ignore[list-item]
                 artifact_base=f"{tmpdir}/artifacts",
                 state_file=f"{tmpdir}/state.json",
-                policy=ReviewPolicy(timeout_seconds=3, max_retries=0, require_non_empty_findings=True),
+                policy=ReviewPolicy(
+                    timeout_seconds=3,
+                    max_retries=0,
+                    require_non_empty_findings=True,
+                    enforce_findings_contract=True,
+                ),
             )
             result = run_review(req, adapters={"claude": adapter})
             self.assertEqual(result.decision, "INCONCLUSIVE")
             self.assertEqual(result.findings_count, 0)
             self.assertEqual(result.parse_success_count, 1)
 
-    def test_plain_text_output_fails_structured_parse(self) -> None:
+    def test_plain_text_output_fails_structured_parse_in_strict_mode(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             adapter = FakeAdapter("claude", "the word findings appears here but not as structured json")
             req = ReviewRequest(
@@ -198,10 +203,37 @@ class ReviewEngineTests(unittest.TestCase):
                 providers=["claude"],  # type: ignore[list-item]
                 artifact_base=f"{tmpdir}/artifacts",
                 state_file=f"{tmpdir}/state.json",
-                policy=ReviewPolicy(timeout_seconds=3, max_retries=0, require_non_empty_findings=True),
+                policy=ReviewPolicy(
+                    timeout_seconds=3,
+                    max_retries=0,
+                    require_non_empty_findings=True,
+                    enforce_findings_contract=True,
+                ),
             )
             result = run_review(req, adapters={"claude": adapter})
             self.assertEqual(result.decision, "INCONCLUSIVE")
+            self.assertEqual(result.parse_success_count, 0)
+            self.assertEqual(result.parse_failure_count, 1)
+
+    def test_plain_text_output_is_allowed_without_strict_contract(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            adapter = FakeAdapter("claude", "plain text output without structured findings payload")
+            req = ReviewRequest(
+                repo_root=tmpdir,
+                prompt="review",
+                providers=["claude"],  # type: ignore[list-item]
+                artifact_base=f"{tmpdir}/artifacts",
+                state_file=f"{tmpdir}/state.json",
+                policy=ReviewPolicy(
+                    timeout_seconds=3,
+                    max_retries=0,
+                    require_non_empty_findings=True,
+                    enforce_findings_contract=False,
+                ),
+            )
+            result = run_review(req, adapters={"claude": adapter})
+            self.assertEqual(result.decision, "PASS")
+            self.assertEqual(result.terminal_state, "COMPLETED")
             self.assertEqual(result.parse_success_count, 0)
             self.assertEqual(result.parse_failure_count, 1)
 
@@ -314,7 +346,7 @@ class ReviewEngineTests(unittest.TestCase):
             self.assertEqual(result.terminal_state, "PARTIAL_SUCCESS")
             self.assertEqual(result.parse_success_count, 1)
             self.assertEqual(result.parse_failure_count, 1)
-            self.assertEqual(result.decision, "PASS")
+            self.assertEqual(result.decision, "PARTIAL")
             self.assertGreaterEqual(slow.cancel_calls, 1)
 
     def test_progress_output_prevents_stall_timeout_in_run_mode(self) -> None:
@@ -536,6 +568,31 @@ class ReviewEngineTests(unittest.TestCase):
             result = run_review(req, adapters={"codex": adapter}, review_mode=False)
             self.assertEqual(result.terminal_state, "COMPLETED")
             self.assertEqual(adapter.last_provider_permissions, {"sandbox": "read-only"})
+
+    def test_stdout_mode_skips_user_artifact_files(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            adapter = FakeAdapter("claude", '{"findings":[]}')
+            req = ReviewRequest(
+                repo_root=tmpdir,
+                prompt="review",
+                providers=["claude"],  # type: ignore[list-item]
+                artifact_base=f"{tmpdir}/artifacts",
+                state_file=f"{tmpdir}/state.json",
+                policy=ReviewPolicy(
+                    timeout_seconds=3,
+                    max_retries=0,
+                    enforce_findings_contract=False,
+                    require_non_empty_findings=True,
+                ),
+            )
+            result = run_review(req, adapters={"claude": adapter}, review_mode=True, write_artifacts=False)
+            root = Path(result.artifact_root)
+            self.assertFalse((root / "summary.md").exists())
+            self.assertFalse((root / "decision.md").exists())
+            self.assertFalse((root / "findings.json").exists())
+            self.assertFalse((root / "run.json").exists())
+            self.assertTrue((root / "providers" / "claude.json").exists())
+            self.assertTrue((root / "raw" / "claude.stdout.log").exists())
 
 
 if __name__ == "__main__":
