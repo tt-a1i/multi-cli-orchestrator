@@ -112,12 +112,23 @@ MCO 默认零配置可用。直接运行即可，按需通过命令行参数覆�
 | 参数 | 默认值 | 说明 |
 |------|--------|------|
 | `--providers` | `claude,codex` | 逗号分隔 provider 列表 |
-| `--stall-timeout` | `900` | 无输出进展超过此时间才取消 |
-| `--review-hard-timeout` | `1800` | review 模式硬截止（`0` = 禁用） |
+| `--stall-timeout` | `900` | 无输出进展超过此时间才取消（秒） |
+| `--review-hard-timeout` | `1800` | review 模式硬截止；`0` = 禁用 |
 | `--max-provider-parallelism` | `0` | `0` = 选中 provider 全并行 |
 | `--enforcement-mode` | `strict` | 权限不满足时 fail-closed |
+| `--strict-contract` | 关闭 | 强制 findings JSON 契约（review 模式） |
 | `--provider-timeouts` | 未设置 | provider 级 stall timeout 覆盖（`provider=seconds`） |
-| `--provider-permissions-json` | 未设置 | provider 权限映射 JSON |
+| `--provider-permissions-json` | 未设置 | provider 权限映射 JSON（见下方） |
+| `--task-id` | 自动生成 | 稳定的任务标识符，用于产物路径 |
+| `--idempotency-key` | 自动生成 | 相同 key 的重复运行返回缓存结果 |
+| `--artifact-base` | `reports/review` | 产物输出基础目录 |
+
+默认 provider 权限：
+
+| Provider | 权限 Key | 默认值 |
+|----------|----------|--------|
+| `claude` | `permission_mode` | `plan` |
+| `codex` | `sandbox` | `workspace-write` |
 
 示例：
 
@@ -133,6 +144,14 @@ mco review \
 ```
 
 运行 `mco review --help` 查看完整参数列表。
+
+## 退出码
+
+| 退出码 | 含义 |
+|--------|------|
+| `0` | 成功 |
+| `2` | FAIL / 输入 / 配置 / 运行时错误 |
+| `3` | INCONCLUSIVE（仅 review 模式，启用 `--strict-contract` 时） |
 
 ## 工作原理
 
@@ -154,9 +173,19 @@ prompt ─> MCO ─┬─> Claude Code  ─┐
 
 执行模型是 **wait-all**：单个 provider 超时或失败不会中断其他 provider。
 
+### 重试与容错
+
+- 瞬态错误（超时、限流、网络抖动）自动重试，指数退避（默认重试 1 次）。
+- 单个 provider 失败不影响其他 provider。
+- 使用相同 `--idempotency-key` 的重复运行直接返回缓存结果，不重新执行。
+
+### 在 Claude Code 内运行
+
+MCO 在启动 provider 子进程前会自动清理 `CLAUDECODE` 环境变量，可以安全地在 Claude Code 会话中运行 `mco`。
+
 ## 产物结构
 
-每次执行生成结构化产物树：
+每次执行生成结构化产物树（根目录可通过 `--artifact-base` 自定义）：
 
 ```
 reports/review/<task_id>/

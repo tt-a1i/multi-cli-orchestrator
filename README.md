@@ -112,14 +112,25 @@ MCO is zero-config by default. You can run it directly with built-in defaults an
 | Flag | Default | Description |
 |------|---------|-------------|
 | `--providers` | `claude,codex` | Comma-separated provider list |
-| `--stall-timeout` | `900` | Cancel when no output progress for this duration |
-| `--review-hard-timeout` | `1800` | Hard deadline for review mode (`0` = disabled) |
+| `--stall-timeout` | `900` | Cancel when no output progress for this duration (seconds) |
+| `--review-hard-timeout` | `1800` | Hard deadline for review mode; `0` disables |
 | `--max-provider-parallelism` | `0` | `0` = full parallelism across selected providers |
 | `--enforcement-mode` | `strict` | `strict` fails closed on unmet permissions |
+| `--strict-contract` | off | Enforce strict findings JSON contract (review mode) |
 | `--provider-timeouts` | unset | Per-provider stall-timeout overrides (`provider=seconds`) |
-| `--provider-permissions-json` | unset | Provider permission mapping JSON |
+| `--provider-permissions-json` | unset | Provider permission mapping JSON (see below) |
+| `--task-id` | auto-generated | Stable task identifier for artifact paths |
+| `--idempotency-key` | auto-generated | Deduplicate repeated runs with the same key |
+| `--artifact-base` | `reports/review` | Base directory for artifact output |
 
-Example:
+Default provider permissions:
+
+| Provider | Key | Default |
+|----------|-----|---------|
+| `claude` | `permission_mode` | `plan` |
+| `codex` | `sandbox` | `workspace-write` |
+
+Override example:
 
 ```bash
 mco review \
@@ -133,6 +144,14 @@ mco review \
 ```
 
 Run `mco review --help` for the full flag list.
+
+## Exit Codes
+
+| Code | Meaning |
+|------|---------|
+| `0` | Success |
+| `2` | FAIL / input / config / runtime error |
+| `3` | INCONCLUSIVE (review mode only, with `--strict-contract`) |
 
 ## How It Works
 
@@ -154,9 +173,19 @@ Each provider runs as an independent subprocess through a uniform adapter contra
 
 Execution model is **wait-all**: one provider's timeout or failure never stops others.
 
+### Retry and Resilience
+
+- Transient errors (timeout, rate-limit, network) are retried automatically with exponential backoff (default: 1 retry).
+- A single provider failure never blocks other providers.
+- Repeated runs with the same `--idempotency-key` return cached results without re-dispatching.
+
+### Running Inside Claude Code
+
+MCO automatically strips the `CLAUDECODE` environment variable before spawning provider subprocesses. You can safely run `mco` from within a Claude Code session.
+
 ## Artifacts
 
-Each run produces a structured artifact tree:
+Each run produces a structured artifact tree (root configurable via `--artifact-base`):
 
 ```
 reports/review/<task_id>/
