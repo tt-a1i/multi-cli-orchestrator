@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import tempfile
 import time
@@ -306,6 +307,19 @@ class ReviewEngineTests(unittest.TestCase):
             run_payload = json.loads(Path(result.artifact_root, "run.json").read_text(encoding="utf-8"))
             keys = list(run_payload["provider_results"].keys())
             self.assertEqual(keys, sorted(keys))
+            self.assertEqual(run_payload["effective_cwd"], str(Path(tmpdir).resolve()))
+            expected_allow_hash = hashlib.sha256(
+                json.dumps(run_payload["allow_paths"], ensure_ascii=True, sort_keys=True, separators=(",", ":")).encode(
+                    "utf-8"
+                )
+            ).hexdigest()
+            self.assertEqual(run_payload["allow_paths_hash"], expected_allow_hash)
+            expected_permissions_hash = hashlib.sha256(
+                json.dumps(
+                    run_payload["provider_permissions"], ensure_ascii=True, sort_keys=True, separators=(",", ":")
+                ).encode("utf-8")
+            ).hexdigest()
+            self.assertEqual(run_payload["permissions_hash"], expected_permissions_hash)
 
     def test_run_mode_accepts_plain_text_without_review_contract(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:

@@ -113,6 +113,11 @@ Artifacts are written to:
 - `<artifact_base>/<task_id>/providers/*.json`
 - `<artifact_base>/<task_id>/raw/*.log`
 
+`run.json` includes audit fields for reproducibility:
+- `effective_cwd`
+- `allow_paths_hash`
+- `permissions_hash`
+
 Notes:
 - YAML config requires `pyyaml` installed; otherwise use JSON config.
 - Review prompt is wrapped with a strict JSON finding contract by default.
