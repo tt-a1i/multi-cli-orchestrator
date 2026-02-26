@@ -130,7 +130,7 @@ class CliTests(unittest.TestCase):
     def test_top_level_help_contains_positioning_and_examples(self) -> None:
         parser = build_parser()
         help_text = parser.format_help()
-        self.assertIn("MCO orchestrates multiple coding-agent CLIs", help_text)
+        self.assertIn("Any Prompt. Any Agent. Any IDE.", help_text)
         self.assertIn("Use `mco run -h` or `mco review -h`", help_text)
         self.assertIn("mco review --repo . --prompt", help_text)
 
