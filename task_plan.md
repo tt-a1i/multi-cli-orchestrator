@@ -21,6 +21,8 @@ Define a practical architecture that supports five mainstream coding CLIs (Claud
 - [x] Phase 15: Capability probe rerun after timeout-wrapper hardening (all providers re-validated)
 - [x] Phase 16: Parallel fan-out runtime (`wait-all`) + provider timeout overrides + performance benchmark
 - [x] Phase 17: Step 5 stability hardening (default provider timeout profile + one-click benchmark + non-blocking scheduled CI benchmark)
+- [x] Phase 18: Step 5 report standardization (fixed markdown template + renderer + parse/findings metric split)
+- [x] Phase 19: GitHub engineering baseline (issue/PR templates + workflow artifact index + v0.1.0 release documentation)
 
 ## Key Questions
 1. How to avoid a single-CLI-centered architecture and make any CLI a first-class entry point?
@@ -44,6 +46,8 @@ Define a practical architecture that supports five mainstream coding CLIs (Claud
 - Capability probes are re-validated after timeout-wrapper hardening in `scripts/run_capability_probes.sh`; latest summary/lock files show 5-provider C0/C1/C2 enabled.
 - Step 4 parallel benchmark completed: serial `143.16s` vs parallel(2) `74.01s` (48.3% lower wall time) with `parse_success_count=5/5` on repeated run.
 - Step 5 stability hardening completed: built-in timeout profile defaults (`claude=300s`, `codex=240s`), one-command benchmark script (`scripts/run_step5_parallel_benchmark.sh`), and non-blocking scheduled benchmark workflow (`.github/workflows/benchmark.yml`).
+- Step 5 reporting is standardized: fixed template at `docs/templates/step5-benchmark-report.md.tpl`, renderer `scripts/render_step5_report.py`, and CI artifact index generator `scripts/collect_ci_artifacts.py`.
+- GitHub collaboration baseline is completed: issue templates and PR template under `.github/`, plus release doc `docs/releases/v0.1.0.md`.
 
 ## Errors Encountered
 - None.

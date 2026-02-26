@@ -1,0 +1,61 @@
+name: Bug report
+description: Report a defect in runtime, adapters, scripts, or CI workflows.
+title: "[Bug] "
+labels:
+  - bug
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What happened and what should have happened?
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction Steps
+      description: Provide exact commands and inputs.
+      placeholder: |
+        1. ./mco review --config ...
+        2. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, Python, provider CLI versions, auth status.
+      placeholder: |
+        - OS:
+        - Python:
+        - claude:
+        - codex:
+        - gemini:
+        - opencode:
+        - qwen:
+    validations:
+      required: true
+
+  - type: textarea
+    id: artifacts
+    attributes:
+      label: Relevant Artifacts
+      description: Paste file paths or excerpts from run artifacts.
+      placeholder: |
+        reports/review/<task_id>/run.json
+        reports/adapter-contract/<date>/runtime-gh-report.md
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Pre-check
+      options:
+        - label: I have run `./scripts/run_runtime_gate_tests.sh`.
+          required: false
+        - label: I have verified provider auth and CLI availability.
+          required: false

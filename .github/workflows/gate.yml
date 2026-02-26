@@ -30,6 +30,18 @@ jobs:
       - name: Run runtime gate tests
         run: ./scripts/run_runtime_gate_tests.sh
 
+      - name: Collect CI artifact index
+        if: always()
+        run: |
+          DATE_STR="$(date +%F)"
+          python3 ./scripts/collect_ci_artifacts.py \
+            --report-root "reports/adapter-contract/$DATE_STR" \
+            --workflow "gate" \
+            --run-id "${{ github.run_id }}"
+          if [ -f "reports/adapter-contract/$DATE_STR/ci-artifact-index.md" ]; then
+            cat "reports/adapter-contract/$DATE_STR/ci-artifact-index.md" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
       - name: Upload runtime gate artifacts
         if: always()
         uses: actions/upload-artifact@v4

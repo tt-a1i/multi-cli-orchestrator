@@ -17,6 +17,9 @@
 ## Planning and Tracking
 1. [task_plan.md](./task_plan.md)
 
+## Release Notes
+1. [docs/releases/v0.1.0.md](./docs/releases/v0.1.0.md)
+
 ## Unified CLI (Step 2)
 `mco review` is the unified entrypoint for running a review task.
 

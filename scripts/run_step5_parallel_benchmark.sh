@@ -6,6 +6,7 @@ ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 DATE_STR="$(date +%F)"
 OUT_DIR="$ROOT_DIR/reports/adapter-contract/$DATE_STR"
 mkdir -p "$OUT_DIR"
+TEMPLATE_PATH="$ROOT_DIR/docs/templates/step5-benchmark-report.md.tpl"
 
 CONFIG_PATH="${1:-$ROOT_DIR/mco.step3-baseline.json}"
 if [[ "$CONFIG_PATH" != /* ]]; then
@@ -136,79 +137,13 @@ jq -n \
     )
   }' >"$SUMMARY_JSON"
 
-SERIAL_TASK="$(jq -r '.serial.task_id // "unknown"' "$SUMMARY_JSON")"
-SERIAL_TIME="$(jq -r '.serial.wall_time_seconds // 0' "$SUMMARY_JSON")"
-SERIAL_PARSE="$(jq -r '.serial.parse_success_count // 0' "$SUMMARY_JSON")"
-SERIAL_PARSE_FAIL="$(jq -r '.serial.parse_failure_count // 0' "$SUMMARY_JSON")"
-SERIAL_TOTAL="$(jq -r '.serial.providers_total // 0' "$SUMMARY_JSON")"
-SERIAL_RATE="$(jq -r '.serial.parse_success_rate // "null"' "$SUMMARY_JSON")"
-SERIAL_EFFECTIVE_FINDINGS="$(jq -r '.serial.effective_findings_count // 0' "$SUMMARY_JSON")"
-SERIAL_ZERO_FINDING_PROVIDERS="$(jq -r '.serial.zero_finding_provider_count // 0' "$SUMMARY_JSON")"
 SERIAL_EXIT="$(jq -r '.serial.command_exit_code // 999' "$SUMMARY_JSON")"
-
-PARALLEL_TASK="$(jq -r '.parallel.task_id // "unknown"' "$SUMMARY_JSON")"
-PARALLEL_TIME="$(jq -r '.parallel.wall_time_seconds // 0' "$SUMMARY_JSON")"
-PARALLEL_PARSE="$(jq -r '.parallel.parse_success_count // 0' "$SUMMARY_JSON")"
-PARALLEL_PARSE_FAIL="$(jq -r '.parallel.parse_failure_count // 0' "$SUMMARY_JSON")"
-PARALLEL_TOTAL="$(jq -r '.parallel.providers_total // 0' "$SUMMARY_JSON")"
-PARALLEL_RATE="$(jq -r '.parallel.parse_success_rate // "null"' "$SUMMARY_JSON")"
-PARALLEL_EFFECTIVE_FINDINGS="$(jq -r '.parallel.effective_findings_count // 0' "$SUMMARY_JSON")"
-PARALLEL_ZERO_FINDING_PROVIDERS="$(jq -r '.parallel.zero_finding_provider_count // 0' "$SUMMARY_JSON")"
 PARALLEL_EXIT="$(jq -r '.parallel.command_exit_code // 999' "$SUMMARY_JSON")"
 
-REDUCTION="$(jq -r '.latency_reduction_percent // "null"' "$SUMMARY_JSON")"
-METRIC_NOTE="$(jq -r '.metric_note // ""' "$SUMMARY_JSON")"
-if [ "$REDUCTION" = "null" ]; then
-  REDUCTION_TEXT="n/a"
-else
-  REDUCTION_TEXT="$(printf '%.1f%%' "$REDUCTION")"
-fi
-if [ "$SERIAL_RATE" = "null" ]; then
-  SERIAL_RATE_TEXT="n/a"
-else
-  SERIAL_RATE_TEXT="$(printf '%.1f%%' "$(jq -n --argjson value "$SERIAL_RATE" '$value * 100')")"
-fi
-if [ "$PARALLEL_RATE" = "null" ]; then
-  PARALLEL_RATE_TEXT="n/a"
-else
-  PARALLEL_RATE_TEXT="$(printf '%.1f%%' "$(jq -n --argjson value "$PARALLEL_RATE" '$value * 100')")"
-fi
-
-{
-  echo "# Step5 Full-Parallel Benchmark ($DATE_STR)"
-  echo
-  echo "## Scenario"
-  echo
-  echo "- Config: \`$CONFIG_PATH\`"
-  echo "- Prompt: smoke contract-only task"
-  echo "- Serial run: \`--max-provider-parallelism 1\`"
-  echo "- Full-parallel run: \`--max-provider-parallelism 0\`"
-  echo
-  echo "## Results"
-  echo
-  echo "1. Serial"
-  echo "   - task_id: \`$SERIAL_TASK\`"
-  echo "   - wall time: \`${SERIAL_TIME}s\`"
-  echo "   - parse: \`${SERIAL_PARSE}\` success / \`${SERIAL_PARSE_FAIL}\` failure"
-  echo "   - parse success rate: \`${SERIAL_PARSE}/${SERIAL_TOTAL} (${SERIAL_RATE_TEXT})\`"
-  echo "   - effective findings: \`${SERIAL_EFFECTIVE_FINDINGS}\`"
-  echo "   - zero-finding providers: \`${SERIAL_ZERO_FINDING_PROVIDERS}\`"
-  echo "   - command exit: \`$SERIAL_EXIT\`"
-  echo "2. Full parallel"
-  echo "   - task_id: \`$PARALLEL_TASK\`"
-  echo "   - wall time: \`${PARALLEL_TIME}s\`"
-  echo "   - parse: \`${PARALLEL_PARSE}\` success / \`${PARALLEL_PARSE_FAIL}\` failure"
-  echo "   - parse success rate: \`${PARALLEL_PARSE}/${PARALLEL_TOTAL} (${PARALLEL_RATE_TEXT})\`"
-  echo "   - effective findings: \`${PARALLEL_EFFECTIVE_FINDINGS}\`"
-  echo "   - zero-finding providers: \`${PARALLEL_ZERO_FINDING_PROVIDERS}\`"
-  echo "   - command exit: \`$PARALLEL_EXIT\`"
-  echo
-  echo "## Delta"
-  echo
-  echo "- Latency reduction (serial -> full parallel): \`$REDUCTION_TEXT\`"
-  echo "- Metrics note: $METRIC_NOTE"
-  echo "- Summary JSON: \`$SUMMARY_JSON\`"
-} >"$REPORT_MD"
+python3 "$ROOT_DIR/scripts/render_step5_report.py" \
+  --template "$TEMPLATE_PATH" \
+  --summary-json "$SUMMARY_JSON" \
+  --output "$REPORT_MD"
 
 echo "Step5 benchmark report: $REPORT_MD"
 echo "Step5 benchmark summary: $SUMMARY_JSON"
