@@ -79,6 +79,16 @@ mco review \
   --providers claude,codex,qwen
 ```
 
+### Agent-Friendly CLI
+
+MCO's CLI is fully self-describing. Run `mco -h` or `mco review -h` to see grouped flags, defaults, and usage examples — all in the terminal. This means any AI agent that can execute shell commands can learn MCO's interface autonomously by reading the help output, without requiring documentation or prior training.
+
+In practice, you simply tell your IDE agent what you want:
+
+> "Use mco to dispatch a security review to Claude and Codex, and a performance analysis to Gemini and Qwen — run them in parallel."
+
+The agent reads `mco -h`, understands the flags, composes the commands, and orchestrates the entire workflow on its own. You describe the intent; the agent handles the rest.
+
 ## Usage
 
 ### Review Mode

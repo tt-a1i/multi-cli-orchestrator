@@ -79,6 +79,16 @@ mco review \
   --providers claude,codex,qwen
 ```
 
+### Agent 友好的 CLI
+
+MCO 的 CLI 完全自描述。运行 `mco -h` 或 `mco review -h` 即可看到分组参数、默认值和用法示例 — 全在终端里。这意味着任何能执行 shell 命令的 AI Agent 都可以通过阅读帮助输出自主学会使用 MCO，无需文档，无需预训练。
+
+实际使用中，你只需要告诉 IDE 里的 Agent 你想要什么：
+
+> "用 mco 把安全审查分发给 Claude 和 Codex，性能分析分发给 Gemini 和 Qwen — 并行执行。"
+
+Agent 读取 `mco -h`，理解参数，组装命令，自主编排整个流程。你描述意图，Agent 处理剩下的一切。
+
 ## 使用方式
 
 ### Review 模式
