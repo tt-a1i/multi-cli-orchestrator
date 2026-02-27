@@ -2,12 +2,13 @@ from __future__ import annotations
 
 import json
 import re
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 from ..contracts import Evidence, NormalizedFinding, NormalizeContext, ProviderId
 
 ALLOWED_SEVERITY = {"critical", "high", "medium", "low"}
 ALLOWED_CATEGORY = {"bug", "security", "performance", "maintainability", "test-gap"}
+_FINAL_TEXT_CANDIDATE_LIMIT = 500
 
 
 def _decode_json_fragments(text: str) -> List[Any]:
@@ -63,7 +64,25 @@ def _looks_like_nested_json_blob(value: str) -> bool:
     return False
 
 
-def _append_text_candidate(candidates: List[str], value: str) -> None:
+def _is_low_signal_candidate(value: str) -> bool:
+    score = _text_candidate_score(value)
+    if score >= -2:
+        return False
+    if value.startswith("<path>") or "<content>" in value:
+        return True
+    # Filter obvious path/tool-ish tokens (e.g. "bin/mco.js", "runtime*").
+    if re.search(r"[./_*:<>\d]", value):
+        return True
+    return False
+
+
+def _append_text_candidate(
+    candidates: List[str],
+    seen: Set[str],
+    value: str,
+    *,
+    limit: int = _FINAL_TEXT_CANDIDATE_LIMIT,
+) -> None:
     normalized = value.strip()
     if not normalized:
         return
@@ -71,8 +90,13 @@ def _append_text_candidate(candidates: List[str], value: str) -> None:
         normalized = normalized.strip("`").strip()
     if not normalized:
         return
-    if candidates and candidates[-1] == normalized:
+    if normalized in seen:
         return
+    if len(candidates) >= limit:
+        return
+    if _is_low_signal_candidate(normalized):
+        return
+    seen.add(normalized)
     candidates.append(normalized)
 
 
@@ -111,41 +135,49 @@ def _select_best_text_candidate(candidates: List[str]) -> str:
     return candidates[best_index]
 
 
-def _collect_final_text_candidates(payload: Any, candidates: List[str]) -> None:
+def _collect_final_text_candidates(
+    payload: Any,
+    candidates: List[str],
+    seen: Set[str],
+    *,
+    limit: int = _FINAL_TEXT_CANDIDATE_LIMIT,
+) -> None:
+    if len(candidates) >= limit:
+        return
     if isinstance(payload, dict):
         payload_type = payload.get("type")
         if isinstance(payload_type, str):
             payload_type = payload_type.lower()
             if payload_type == "text" and isinstance(payload.get("text"), str):
-                _append_text_candidate(candidates, payload.get("text", ""))
+                _append_text_candidate(candidates, seen, payload.get("text", ""), limit=limit)
             if payload_type in ("result", "final", "completion", "assistant", "message"):
                 for key in ("result", "final_text", "text", "content", "message", "response", "output"):
                     value = payload.get(key)
                     if isinstance(value, str):
-                        _append_text_candidate(candidates, value)
+                        _append_text_candidate(candidates, seen, value, limit=limit)
 
         for key in ("final_text", "result", "text", "content", "message", "response", "output", "output_text"):
             value = payload.get(key)
             if isinstance(value, str):
                 if _looks_like_nested_json_blob(value):
                     for nested_payload in _decode_json_fragments(value):
-                        _collect_final_text_candidates(nested_payload, candidates)
+                        _collect_final_text_candidates(nested_payload, candidates, seen, limit=limit)
                 else:
-                    _append_text_candidate(candidates, value)
+                    _append_text_candidate(candidates, seen, value, limit=limit)
 
         for value in payload.values():
             if isinstance(value, (dict, list)):
-                _collect_final_text_candidates(value, candidates)
+                _collect_final_text_candidates(value, candidates, seen, limit=limit)
     elif isinstance(payload, list):
         for item in payload:
             if isinstance(item, (dict, list)):
-                _collect_final_text_candidates(item, candidates)
+                _collect_final_text_candidates(item, candidates, seen, limit=limit)
             elif isinstance(item, str):
                 if _looks_like_nested_json_blob(item):
                     for nested_payload in _decode_json_fragments(item):
-                        _collect_final_text_candidates(nested_payload, candidates)
+                        _collect_final_text_candidates(nested_payload, candidates, seen, limit=limit)
                 else:
-                    _append_text_candidate(candidates, item)
+                    _append_text_candidate(candidates, seen, item, limit=limit)
 
 
 def extract_final_text_from_output(text: str) -> str:
@@ -162,8 +194,9 @@ def extract_final_text_from_output(text: str) -> str:
         return raw
 
     candidates: List[str] = []
+    seen: Set[str] = set()
     for payload in payloads:
-        _collect_final_text_candidates(payload, candidates)
+        _collect_final_text_candidates(payload, candidates, seen)
 
     return _select_best_text_candidate(candidates) if candidates else raw
 

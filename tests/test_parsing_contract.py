@@ -2,10 +2,28 @@ from __future__ import annotations
 
 import unittest
 
-from runtime.adapters.parsing import extract_final_text_from_output, inspect_contract_output
+from runtime.adapters.parsing import _append_text_candidate, extract_final_text_from_output, inspect_contract_output
 
 
 class ParsingContractTests(unittest.TestCase):
+    def test_append_text_candidate_dedupes_globally_and_enforces_limit(self) -> None:
+        candidates = []
+        seen = set()
+        _append_text_candidate(candidates, seen, "alpha", limit=3)
+        _append_text_candidate(candidates, seen, "alpha", limit=3)
+        _append_text_candidate(candidates, seen, "beta", limit=3)
+        _append_text_candidate(candidates, seen, "gamma", limit=3)
+        _append_text_candidate(candidates, seen, "delta", limit=3)
+        self.assertEqual(candidates, ["alpha", "beta", "gamma"])
+
+    def test_append_text_candidate_filters_low_signal_path_tokens(self) -> None:
+        candidates = []
+        seen = set()
+        _append_text_candidate(candidates, seen, "bin/mco.js")
+        _append_text_candidate(candidates, seen, "runtime*")
+        _append_text_candidate(candidates, seen, "最终回答")
+        self.assertEqual(candidates, ["最终回答"])
+
     def test_extract_final_text_from_plain_text(self) -> None:
         text = "This is the final answer."
         self.assertEqual(extract_final_text_from_output(text), text)
