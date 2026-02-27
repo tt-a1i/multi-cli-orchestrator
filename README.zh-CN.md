@@ -18,6 +18,16 @@
 >
 > 一条命令，五个 Agent 同时干活。
 
+### 与 OpenClaw 配合使用
+
+你的机器上运行着 [OpenClaw](https://github.com/open-claw/open-claw)？它可以直接使用 MCO 作为多 Agent 编排后端。只需告诉 OpenClaw 你的需求：
+
+> "用 mco 对这个仓库做安全审查，使用 Claude、Codex 和 Gemini，汇总结果。"
+
+OpenClaw 读取 `mco -h`，学会 CLI 接口，自主编排整个多 Agent 工作流。你的本地电脑变成一个多 Agent 审查团队 — OpenClaw 是管理者，MCO 是调度器，Claude/Codex/Gemini/OpenCode/Qwen 是团队成员。
+
+同样适用于 **Claude Code、Cursor、Trae、Copilot、Windsurf**，或任何能执行 shell 命令的 Agent。
+
 ## MCO 是什么
 
 MCO（Multi-CLI Orchestrator）是一个中立的 AI 编程 Agent 编排层。它将提示词并行分发给多个 Agent CLI，汇总执行结果，返回结构化输出 — JSON、SARIF 或 PR Markdown 报告。不绑定任何厂商，不改变你的工作流。
@@ -89,14 +99,6 @@ MCO 设计为被任意编排方 Agent 或 AI IDE 调用 — Claude Code、Cursor
 | 架构分析 | `mco run --providers claude,gemini,qwen` | 多视角架构评估 |
 | 部署前健康检查 | `mco doctor --json` | 确认所有 Agent 已安装且已认证 |
 | 共识决策 | `mco review --synthesize` | 汇总 Agent 共识、标注分歧 |
-
-### 与 OpenClaw 配合使用
-
-如果你的机器上运行着 [OpenClaw](https://github.com/open-claw/open-claw)，它可以直接使用 MCO 作为多 Agent 编排后端。只需告诉 OpenClaw 你的需求：
-
-> "用 mco 对这个仓库做安全审查，使用 Claude、Codex 和 Gemini，汇总结果。"
-
-OpenClaw 读取 `mco -h`，学会 CLI 接口，自主编排整个多 Agent 工作流。你的本地电脑变成一个多 Agent 审查团队 — OpenClaw 是管理者，MCO 是调度器，Claude/Codex/Gemini/OpenCode/Qwen 是团队成员。
 
 ## 快速开始
 

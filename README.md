@@ -18,6 +18,16 @@ English | [简体中文](./README.zh-CN.md)
 >
 > One command. Five agents working at once.
 
+### Works with OpenClaw
+
+Running [OpenClaw](https://github.com/open-claw/open-claw) on your machine? It can use MCO as its multi-agent backbone. Just tell OpenClaw what you need:
+
+> "Use mco to run a security review on this repo with Claude, Codex, and Gemini. Synthesize the results."
+
+OpenClaw reads `mco -h`, learns the CLI, and orchestrates the entire workflow autonomously. Your local machine becomes a multi-agent review team — OpenClaw is the manager, MCO is the dispatcher, and Claude/Codex/Gemini/OpenCode/Qwen are the team members.
+
+This works the same way from **Claude Code, Cursor, Trae, Copilot, Windsurf**, or any agent that can run shell commands.
+
 ## What is MCO
 
 MCO (Multi-CLI Orchestrator) is a neutral orchestration layer for AI coding agents. It dispatches prompts to multiple agent CLIs in parallel, aggregates results, and returns structured output — JSON, SARIF, or PR-ready Markdown. No vendor lock-in. No workflow rewrite.
@@ -89,14 +99,6 @@ The adapter architecture is extensible — adding a new agent CLI requires imple
 | Architecture analysis | `mco run --providers claude,gemini,qwen` | Multi-perspective architecture assessment |
 | Pre-deploy health check | `mco doctor --json` | Verify all agents are installed and authenticated |
 | Consensus decision | `mco review --synthesize` | Summarize what agents agree on and where they diverge |
-
-### Works with OpenClaw
-
-If you're running [OpenClaw](https://github.com/open-claw/open-claw) on your machine, it can use MCO as its multi-agent backbone. Just tell OpenClaw what you need:
-
-> "Use mco to run a security review on this repo with Claude, Codex, and Gemini. Synthesize the results."
-
-OpenClaw reads `mco -h`, learns the CLI interface, and orchestrates the entire multi-agent workflow autonomously. Your local machine becomes a multi-agent review team — OpenClaw is the manager, MCO is the dispatcher, and Claude/Codex/Gemini/OpenCode/Qwen are the team members.
 
 ## Quick Start
 
